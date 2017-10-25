@@ -1,6 +1,6 @@
 ---
 title: "read_me"
-author: "Drew Faturos"
+author: "Drew, Kate, Maggie, Ethan"
 date: "10/25/2017"
 output: pdf_document
 ---
@@ -17,4 +17,8 @@ library(tidyverse)
 ```
 
 Kate test
+
+
+
+
 
