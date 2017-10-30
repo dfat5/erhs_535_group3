@@ -1,0 +1,20 @@
+---
+title: "Notes"
+author: "Indpednent vs Dependent"
+date: "10/30/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+possible graphs to use for visualization: 
+ggspectra 
+
+ggpmsic 
+
+ggsci 
+
+GGally 
+
+gganimate 
