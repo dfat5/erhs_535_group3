@@ -8,13 +8,51 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+predict drug efficacy by drug and dose 
+
+indpendent varaibles drug and dose and many other things:
+
+lots of dependent variable are just ELU and ESP
+
+To do: 
+look at distrubution of data
+like to plot drug based on efficacy (ie in spleen, or lung) - could use box plot or beeswarm 
+
+
+Tasks: 
+get familiar with a different visualization, try with pacakges extra data, then try using the data we were given
+
+
 possible graphs to use for visualization: 
+ggbeeswarm- show distrubution of data with respect to different mice 
+
 ggspectra 
 
-ggpmsic 
+ggpmsic uses broom and glance lots of options of residuals etc. 
+
+gghighlight lets you label outliers 
+
+ggrepel repels lables so they don't overlap 
 
 ggsci 
 
 GGally 
 
-gganimate 
+gganimate- displays changes in data over time by moving points as time changes 
+
+ggridges-  used to display density distrubution, so desnity of mice potentially 
+
+cowplot- displays a lot of different data together 
+
+ggalt - selects outliers
+
+
+*want to be able to display error bars 
+want to label each drug type 
+
+model 
+glm 
+regression/trees classification 
+
+
+book: introduction to statistical learning
