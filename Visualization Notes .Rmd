@@ -24,7 +24,7 @@ get familiar with a different visualization, try with pacakges extra data, then 
 
 
 possible graphs to use for visualization: 
-ggbeeswarm- show distrubution of data with respect to different mice 
+ggbeeswarm- show distrubution of data with respect to different mice (use the pd page for generating beeswarm, also need to include a gather step)
 
 ggspectra 
 
