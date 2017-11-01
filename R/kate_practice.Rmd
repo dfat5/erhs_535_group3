@@ -1,5 +1,5 @@
 ---
-title: "Beeswarm practice"
+title: "ggpmisc practice"
 author: "Kate Huebner"
 date: "11/1/2017"
 output: word_document
@@ -7,7 +7,16 @@ output: word_document
 
 Modelling dependent~independent variables to determine variables associated with drug efficacy against TB. Dependent Variables are ELU (efficacy in the lungs) and ESP (efficacy in the spleen). Cmax and Trough indicate different drug concentrations and values are averaged across many mice at different drug doseages. Dependent variables include biologic and chemical (in vitro) measures. 
 
-Here I will use beeswarm to plot scatterplots to show variation of different variables. ggbeeswarm provides two methods of plotting categorical scatter plots such that the arrangement of points within a category reflects the density of data at that region, and avoids over-plotting
+Extensions to 'ggplot2' respecting the grammar of graphics
+paradigm. Provides new statistics to locate and tag peaks and valleys in 2D
+plots, a statistics to add a label with the equation of a polynomial fitted
+with lm(), or R^2 or adjusted R^2 or information criteria for any model
+fitted with function lm(). Additional statistics give access to functions
+in package 'broom'. Provides a function for flexibly converting time
+series to data frames suitable for plotting with ggplot(). In addition
+provides statistics and ggplot geometries useful for diagnosing what data
+are passed to compute_group() and compute_panel() functions and to
+geometries.
 
 ```{r global_Options, echo=TRUE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE,
@@ -18,13 +27,14 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE,
 #Loading libraires
 library(dplyr)
 library(tidyr)
-library(readr)
 library(ggplot2)
 library(ggthemes)
-library(RColorBrewer)
-library(maps) 
 library(readxl)
-library(ggbeeswarm)
+library(ggpmisc)
+library(broom)
+library(devtools)
+install_github('sinhrks/ggfortify')
+library(ggfortify)
 
 ```
 
@@ -41,11 +51,12 @@ head(trough)
 
 ```
 ```{r}
-#data cleaning
-cmax <- cmax %>% 
-  rename(Drug = X__1)
+#CMAX data cleaning
+cmax_clean <- cmax %>% 
+  rename(drug = X__1,
+         dose = Dose) %>% 
   
-
-cmax
+  
+head(cmax)
 ```
 
