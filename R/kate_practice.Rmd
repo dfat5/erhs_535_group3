@@ -1,0 +1,62 @@
+---
+title: "ggpmisc practice"
+author: "Kate Huebner"
+date: "11/1/2017"
+output: word_document
+---
+
+Modelling dependent~independent variables to determine variables associated with drug efficacy against TB. Dependent Variables are ELU (efficacy in the lungs) and ESP (efficacy in the spleen). Cmax and Trough indicate different drug concentrations and values are averaged across many mice at different drug doseages. Dependent variables include biologic and chemical (in vitro) measures. 
+
+Extensions to 'ggplot2' respecting the grammar of graphics
+paradigm. Provides new statistics to locate and tag peaks and valleys in 2D
+plots, a statistics to add a label with the equation of a polynomial fitted
+with lm(), or R^2 or adjusted R^2 or information criteria for any model
+fitted with function lm(). Additional statistics give access to functions
+in package 'broom'. Provides a function for flexibly converting time
+series to data frames suitable for plotting with ggplot(). In addition
+provides statistics and ggplot geometries useful for diagnosing what data
+are passed to compute_group() and compute_panel() functions and to
+geometries.
+
+```{r global_Options, echo=TRUE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,
+                      warning = FALSE, error = FALSE)
+```
+
+```{r echo=FALSE}
+#Loading libraires
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggthemes)
+library(readxl)
+library(ggpmisc)
+library(broom)
+library(devtools)
+install_github('sinhrks/ggfortify')
+library(ggfortify)
+
+```
+
+```{r}
+#Reading in data
+cmax <- read_excel("../data/DRUG_CLASS_I_Mean_Cmax_Trough_Efficacy_R_DATA_ANALYSIS.xlsx",
+                    sheet = "Mean_PK_Efficacy_In vitro", skip = 1, n_max = 12)
+
+trough <- read_excel("../data/DRUG_CLASS_I_Mean_Cmax_Trough_Efficacy_R_DATA_ANALYSIS.xlsx",
+                   sheet = "Mean_PK_Efficacy_In vitro", skip = 16, n_max = 12)
+
+head(cmax)
+head(trough)
+
+```
+```{r}
+#CMAX data cleaning
+cmax_clean <- cmax %>% 
+  rename(drug = X__1,
+         dose = Dose) %>% 
+  
+  
+head(cmax)
+```
+
