@@ -27,6 +27,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE,
 #Loading libraires
 library(dplyr)
 library(tidyr)
+library(readr)
 library(ggplot2)
 library(ggthemes)
 library(readxl)
@@ -39,7 +40,7 @@ library(ggfortify)
 ```
 
 ```{r}
-#Reading in data
+#Reading in unclean data
 cmax <- read_excel("../data/DRUG_CLASS_I_Mean_Cmax_Trough_Efficacy_R_DATA_ANALYSIS.xlsx",
                     sheet = "Mean_PK_Efficacy_In vitro", skip = 1, n_max = 12)
 
@@ -50,13 +51,38 @@ head(cmax)
 head(trough)
 
 ```
+
+
 ```{r}
 #CMAX data cleaning
 cmax_clean <- cmax %>% 
-  rename(drug = X__1,
-         dose = Dose) %>% 
+  rename(drug = X__1, dose = Dose) %>% 
+  gather(key = dependent, value = value_dependent, ELU:ESP) %>% 
+  gather(key = independent, value = value_independent, -dependent, -value_dependent, -drug, -dose) %>% 
+  mutate(value_dependent = as.numeric(value_dependent),
+         value_independent = as.numeric(value_independent)) 
+head(cmax_clean)
+```
+
+```{r}
+#histogram
+histogram_plot <- cmax_clean %>% 
+  ggplot(aes(x = value_independent)) +
+  geom_histogram() +
+  labs(x = "Independent variable", y = "Dependent Variable") +
+  facet_wrap(~independent, scales = "free")
   
+histogram_plot
+```
+
+```{r fig.width=8, fig.height=6}
+scatter_plot <- cmax_clean %>% 
+  ggplot(aes(x = value_independent, y = value_dependent, color = dose)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(aes(color = NULL)) +
+  labs(x = "Independent variable", y = "Dependent Variable") +
+  facet_wrap(~independent, scales = "free_x")
   
-head(cmax)
+scatter_plot
 ```
 
