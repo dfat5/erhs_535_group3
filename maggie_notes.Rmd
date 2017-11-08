@@ -5,13 +5,6 @@ date: "11/8/2017"
 output: html_document
 ---
 
----
-title: "Analysis Master"
-author: "Ethan Walker"
-date: "November 1, 2017"
-output: html_document
----
-
 ```{r, include=FALSE}
 library(readxl)
 library(tidyverse)
