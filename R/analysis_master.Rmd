@@ -10,6 +10,7 @@ library(readxl)
 library(tidyverse)
 library(ggrepel)
 library(gghighlight)
+source("practice_data.R")
 ```
 
 #Association between dependent and independent variables:
@@ -20,12 +21,3 @@ with effectiveness against TB. This group will need to come up with
 ways (and code) to analyze that in the data. This might include
 generalized linear models, scatterplots, and possibly other supervised
 learning methods.
-
-#Pull in Data
-```{r}
-efficacy_summary <- read_csv("https://raw.githubusercontent.com/KatieKey/input_output_shiny_group/master/CSV_Files/efficacy_summary.csv")
-head(efficacy_summary)
-
-clean_2_combined <- read_csv("https://raw.githubusercontent.com/KatieKey/input_output_shiny_group/master/CSV_Files/clean_2_combined.csv")
-head(clean_2_combined)
-```
