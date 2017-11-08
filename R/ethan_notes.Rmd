@@ -9,6 +9,8 @@ library(readxl)
 library(tidyverse)
 library(ggrepel)
 library(gghighlight)
+library(ggplot2)
+source("practice_data.R")
 ```
 
 #Association between dependent and independent variables:
