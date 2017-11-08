@@ -20,6 +20,20 @@ ways (and code) to analyze that in the data. This might include
 generalized linear models, scatterplots, and possibly other supervised
 learning methods.
 
+Next:
+Clean data to facet by ind vars
+
+Regression Tree
+
+```{r}
+efficacy_summary <- read_csv("https://raw.githubusercontent.com/KatieKey/input_output_shiny_group/master/CSV_Files/efficacy_summary.csv")
+head(efficacy_summary)
+
+clean_2_combined <- read_csv("https://raw.githubusercontent.com/KatieKey/input_output_shiny_group/master/CSV_Files/clean_2_combined.csv")
+head(clean_2_combined)
+```
+
+
 ```{r}
 cmax <- read_excel("../data/DRUG_CLASS_I_Mean_Cmax_Trough_Efficacy_R_DATA_ANALYSIS.xlsx", 
                    sheet = "Mean_PK_Efficacy_In vitro", skip = 1, n_max = 12)
@@ -32,9 +46,13 @@ Dependent Variables:
 ELU - efficacy lungs
 ESP - efficacy spleen
 
+Start cleaning data up
 ```{r}
 cmax_clean <- cmax %>%
-  rename(drug = X__1)
+  rename(drug = X__1, dose = Dose) %>% 
+  gather(key = dependent, value = value_dependent, ELU:ESP) %>% 
+  gather(key = independent, value = value_independent, -dependent, -value_dependent, - drug, -dose) %>% 
+  mutate(value_dependent = as.numeric(value_dependent), value_independent = as.numeric(value_independent)) 
 head(cmax_clean)
 ```
 
@@ -92,6 +110,14 @@ ggplot(cmax_clean) +
   
 This lets you filter based on values that you specify, then highlights the points that meet the requirements.
 ```{r}
-gghighlight_point(data = cmax_clean, aes(ELU, PLA), ELU > 2 & PLA > 20000, label_key = drug)
+gghighlight_point(data = cmax_clean, aes(ELU, PLA), ELU > 2 & PLA > 10000, label_key = drug)
+```
+
+```{r}
+plot_1 <- cmax_clean %>% 
+  ggplot() +
+  geom_point(aes(x = value_independent, y = value_dependent)) +
+  facet_wrap(~ independent, scales = "free_x")
+plot_1
 ```
 
