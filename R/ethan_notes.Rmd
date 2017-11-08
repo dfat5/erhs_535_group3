@@ -10,6 +10,8 @@ library(tidyverse)
 library(ggrepel)
 library(gghighlight)
 library(ggplot2)
+library(rpart)
+library(randomForest)
 source("practice_data.R")
 ```
 
@@ -23,9 +25,11 @@ generalized linear models, scatterplots, and possibly other supervised
 learning methods.
 
 Next:
-Clean data to facet by ind vars
-
-Regression Tree
+Regression Tree - Ethan (also work on scatterplots more)
+Random forest - Drew
+Stepwise - Maggie
+Univariate models for each independent var - Kate
+GLM model - Kate
 
 ```{r}
 efficacy_summary <- read_csv("https://raw.githubusercontent.com/KatieKey/input_output_shiny_group/master/CSV_Files/efficacy_summary.csv")
@@ -44,9 +48,6 @@ trough <- read_excel("../data/DRUG_CLASS_I_Mean_Cmax_Trough_Efficacy_R_DATA_ANAL
                      sheet = "Mean_PK_Efficacy_In vitro", skip = 16, n_max = 12)
 ```
 
-Dependent Variables:
-ELU - efficacy lungs
-ESP - efficacy spleen
 
 Start cleaning data up
 ```{r}
@@ -121,5 +122,18 @@ plot_1 <- cmax_clean %>%
   geom_point(aes(x = value_independent, y = value_dependent)) +
   facet_wrap(~ independent, scales = "free_x")
 plot_1
+```
+
+
+
+Trying plots with new cleaned data from other group:
+```{r}
+
+```
+
+
+Practice with rpart package:
+```{r}
+
 ```
 
