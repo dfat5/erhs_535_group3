@@ -9,10 +9,13 @@ library(readxl)
 library(tidyverse)
 library(ggrepel)
 library(gghighlight)
+<<<<<<< HEAD
 library(ggplot2)
 library(rpart)
 library(randomForest)
 source("practice_data.R")
+=======
+>>>>>>> 83ac64e6702a0f23f4b18f0b65bedc2883a0943f
 ```
 
 #Association between dependent and independent variables:

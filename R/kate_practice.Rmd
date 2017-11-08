@@ -5,7 +5,7 @@ date: "11/1/2017"
 output: word_document
 ---
 
-Modelling dependent~independent variables to determine variables associated with drug efficacy against TB. Dependent Variables are ELU (efficacy in the lungs) and ESP (efficacy in the spleen). Cmax and Trough indicate different drug concentrations and values are averaged across many mice at different drug doseages. Dependent variables include biologic and chemical (in vitro) measures. 
+Modelling dependent~independent variables to determine variables associated with drug efficacy against TB. Dependent Variables are ELU (efficacy in the lungs) and ESP (efficacy in the spleen). SPleen and lung are the main outcome variables. Cmax and Trough indicate different drug concentrations and values are averaged across many mice at different drug doseages. Dependent variables include biologic and chemical (in vitro) measures. 
 
 Extensions to 'ggplot2' respecting the grammar of graphics
 paradigm. Provides new statistics to locate and tag peaks and valleys in 2D
@@ -18,6 +18,8 @@ provides statistics and ggplot geometries useful for diagnosing what data
 are passed to compute_group() and compute_panel() functions and to
 geometries.
 
+Kate- Regression model with lm. fit linear regressoin that are univariate and do separate variables. try a backwards stepwise regression. one would be univariate model for each thing separately, maybe by dose separate as well. i will do univariate with lm and use ggmisc. i will focus on the lung. 
+
 ```{r global_Options, echo=TRUE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE,
                       warning = FALSE, error = FALSE)
@@ -27,36 +29,43 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE,
 #Loading libraires
 library(dplyr)
 library(tidyr)
+library(readr)
 library(ggplot2)
 library(ggthemes)
 library(readxl)
 library(ggpmisc)
 library(broom)
 library(devtools)
-install_github('sinhrks/ggfortify')
 library(ggfortify)
 
 ```
 
 ```{r}
-#Reading in data
-cmax <- read_excel("../data/DRUG_CLASS_I_Mean_Cmax_Trough_Efficacy_R_DATA_ANALYSIS.xlsx",
-                    sheet = "Mean_PK_Efficacy_In vitro", skip = 1, n_max = 12)
-
-trough <- read_excel("../data/DRUG_CLASS_I_Mean_Cmax_Trough_Efficacy_R_DATA_ANALYSIS.xlsx",
-                   sheet = "Mean_PK_Efficacy_In vitro", skip = 16, n_max = 12)
-
-head(cmax)
-head(trough)
+#Reading in unclean data
+source("../R/practice_data.R")
 
 ```
+
+
 ```{r}
-#CMAX data cleaning
-cmax_clean <- cmax %>% 
-  rename(drug = X__1,
-         dose = Dose) %>% 
+#histogram
+histogram_plot <- cmax_clean %>% 
+  ggplot(aes(x = value_independent)) +
+  geom_histogram() +
+  labs(x = "Independent variable", y = "Dependent Variable") +
+  facet_wrap(~independent, scales = "free")
   
+histogram_plot
+```
+
+```{r fig.width=8, fig.height=6}
+scatter_plot <- cmax_clean %>% 
+  ggplot(aes(x = value_independent, y = value_dependent, color = dose)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(aes(color = NULL)) +
+  labs(x = "Independent variable", y = "Dependent Variable") +
+  facet_wrap(~independent, scales = "free_x")
   
-head(cmax)
+scatter_plot
 ```
 
