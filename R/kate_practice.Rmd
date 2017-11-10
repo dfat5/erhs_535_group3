@@ -76,24 +76,11 @@ scatter_plot <- Cmax %>%
   
 scatter_plot
 ```
-
 ```{r}
-#Univariate Models
-linear_model <- function(variable, df = Cmax) {
-  df <- df %>%
-    filter(independent_var == variable) %>%
-    select(indep_measure, df$ELU) %>%
-    a <- lm(df$ELU ~ indep_measure)
-    # class(a)
-    # glance(a)
-    # tidy(a)
-}
 
-```
-
-```{r}
 Caseum_binding <- Cmax %>% 
   filter(independent_var == "Caseum_binding") %>% 
+  filter(dose_int == "BID") %>% 
   select(ELU, indep_measure) 
  
 Caseum_binding_mod <- lm(ELU ~ indep_measure, data = Caseum_binding)
@@ -102,6 +89,25 @@ class(Caseum_binding_mod)
 names(Caseum_binding_mod)
 glance(Caseum_binding_mod)
 tidy(Caseum_binding_mod)
+
 ```
+
+```{r}
+#Univariate Models
+linear_model <- function(df = Cmax, indep_variable, dose_int) {
+  df <- df %>%
+    filter(independent_var == "indep_variable") %>% 
+    filter(dose_int == "dose_int") %>% 
+    select(ELU, indep_measure) 
+}
+
+a <- linear_model(indep_variable = ICS, dose_int = BID)
+a
+
+```
+
+
+
+
 
 
