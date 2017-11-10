@@ -1,5 +1,5 @@
 ---
-title: "ggpmisc practice"
+title: "univariate models"
 author: "Kate Huebner"
 date: "11/1/2017"
 output: word_document
@@ -18,7 +18,7 @@ provides statistics and ggplot geometries useful for diagnosing what data
 are passed to compute_group() and compute_panel() functions and to
 geometries.
 
-Kate- Regression model with lm. fit linear regressoin that are univariate and do separate variables. try a backwards stepwise regression. one would be univariate model for each thing separately, maybe by dose separate as well. i will do univariate with lm and use ggmisc. i will focus on the lung. 
+Kate assignment- Regression model with lm. fit linear regression that are univariate and do separate variables. try a backwards stepwise regression. one would be univariate model for each thing separately, maybe by dose separate as well. i will do univariate with lm and use ggmisc. i will focus on the lung. 
 
 ```{r global_Options, echo=TRUE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE,
@@ -42,30 +42,66 @@ library(ggfortify)
 
 ```{r}
 #Reading in unclean data
-source("../R/practice_data.R")
+source("practice_data.R")
 
+```
+```{r}
+Cmax <- efficacy_summary %>% 
+  filter(level == "Cmax") %>% 
+  gather(key = independent_var, value = indep_measure, -drug, -dosage, -dose_int, -level, -ELU, -ESP, na.rm = TRUE) %>% 
+  select(-ESP)
+
+head(Cmax)
 ```
 
 
 ```{r}
 #histogram
-histogram_plot <- cmax_clean %>% 
-  ggplot(aes(x = value_independent)) +
+histogram_plot <- Cmax %>% 
+  ggplot(aes(x = indep_measure)) +
   geom_histogram() +
   labs(x = "Independent variable", y = "Dependent Variable") +
-  facet_wrap(~independent, scales = "free")
+  facet_wrap(~independent_var, scales = "free")
   
 histogram_plot
 ```
 
 ```{r fig.width=8, fig.height=6}
-scatter_plot <- cmax_clean %>% 
-  ggplot(aes(x = value_independent, y = value_dependent, color = dose)) +
+scatter_plot <- Cmax %>% 
+  ggplot(aes(x = indep_measure, y = ELU, color = dose_int)) +
   geom_point(alpha = 0.5) +
   geom_smooth(aes(color = NULL)) +
   labs(x = "Independent variable", y = "Dependent Variable") +
-  facet_wrap(~independent, scales = "free_x")
+  facet_wrap(~independent_var, scales = "free_x")
   
 scatter_plot
 ```
+
+```{r}
+#Univariate Models
+linear_model <- function(variable, df = Cmax) {
+  df <- df %>%
+    filter(independent_var == variable) %>%
+    select(indep_measure, df$ELU) %>%
+    a <- lm(df$ELU ~ indep_measure)
+    # class(a)
+    # glance(a)
+    # tidy(a)
+}
+
+```
+
+```{r}
+Caseum_binding <- Cmax %>% 
+  filter(independent_var == "Caseum_binding") %>% 
+  select(ELU, indep_measure) 
+ 
+Caseum_binding_mod <- lm(ELU ~ indep_measure, data = Caseum_binding)
+
+class(Caseum_binding_mod)
+names(Caseum_binding_mod)
+glance(Caseum_binding_mod)
+tidy(Caseum_binding_mod)
+```
+
 
