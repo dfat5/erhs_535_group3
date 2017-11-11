@@ -1,7 +1,7 @@
 ---
 title: "Ethan Notes and Examples"
 author: "Ethan Walker"
-date: "October 31, 2017"
+date: "November 11, 2017"
 output: html_document
 ---
 ```{r, include=FALSE}
@@ -12,6 +12,7 @@ library(gghighlight)
 library(ggplot2)
 library(rpart)
 library(randomForest)
+library(ggthemes)
 source("practice_data.R")
 ```
 
@@ -60,8 +61,8 @@ head(cmax_clean)
 ```
 
 
-#Example from ggrepel vignette
-##geom_text  
+Example from ggrepel vignette
+geom_text  
 https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html
 ```{r}
 library(ggplot2)
@@ -71,7 +72,7 @@ ggplot(mtcars) +
   theme_classic(base_size = 16)
 ```
 
-##geom_text_repel
+geom_text_repel
 ```{r}
 library(ggrepel)
 set.seed(42)
@@ -81,7 +82,7 @@ ggplot(mtcars) +
   theme_classic(base_size = 16)
 ```
 
-##geom_label_repel
+geom_label_repel
 ```{r}
 set.seed(42)
 ggplot(mtcars) +
@@ -95,13 +96,12 @@ ggplot(mtcars) +
   theme_classic(base_size = 16)
 ```
 
-#Scatterplots with our data
-
+Scatterplots with our data
 ```{r}
-ggplot(cmax_clean) +
+ggplot(efficacy_summary) +
   geom_point(aes(ELU, PLA), size = 5, color = 'grey') +
   geom_label_repel(
-    aes(ELU, PLA, fill = Dose, label = drug),
+    aes(ELU, PLA, fill = dosage, label = drug),
     fontface = 'bold', color = 'white',
     box.padding = 0.35, point.padding = 0.5,
     segment.color = 'grey50'
@@ -109,31 +109,55 @@ ggplot(cmax_clean) +
   theme_classic(base_size = 16)
 ```
 
-##Trying gghighlight
-  
+Trying gghighlight:
 This lets you filter based on values that you specify, then highlights the points that meet the requirements.
 ```{r}
-gghighlight_point(data = cmax_clean, aes(ELU, PLA), ELU > 2 & PLA > 10000, label_key = drug)
+gghighlight_point(data = efficacy_summary, aes(ELU, PLA), ELU > 2 & PLA > 10000, label_key = drug)
 ```
 
+
+Faceting with independent variables
+Making data long to facet with
 ```{r}
-plot_1 <- cmax_clean %>% 
+efficacy_summary_long <- efficacy_summary %>% 
+  gather(key = dependent, value = value_dependent, ELU:ESP) %>% 
+  gather(key = independent_bio, value = value_independent_bio, PLA:SLE) %>%
+  gather(key = independent_chem, value = value_independent_chem, cLogP:MacUptake) %>%
+  mutate(value_dependent = as.numeric(value_dependent), 
+         value_independent_bio = as.numeric(value_independent_bio), 
+         value_independent_chem = as.numeric(value_independent_chem)) 
+head(efficacy_summary_long)
+```
+```{r}
+plot_1 <- efficacy_summary_long %>% 
   ggplot() +
-  geom_point(aes(x = value_independent, y = value_dependent)) +
-  facet_wrap(~ independent, scales = "free_x")
+  geom_point(aes(x = value_independent_bio, y = value_dependent)) +
+  facet_wrap(~ independent_bio, scales = "free_x") +
+  theme_few()
 plot_1
 ```
 
-
-
-Trying plots with new cleaned data from other group:
-```{r}
-
-```
-
-
 Practice with rpart package:
 ```{r}
-
+fit <- rpart(Kyphosis ~ Age + Number + Start, data = kyphosis)
+fit2 <- rpart(Kyphosis ~ Age + Number + Start, data = kyphosis, 
+              parms = list(prior = c(0.65, 0.35), split = "information"))
+fit3 <- rpart(Kyphosis ~ Age + Number + Start, data=kyphosis, 
+              control = rpart.control(cp = 0.05))
+par(mfrow = c(1,2), xpd = TRUE)
+plot(fit)
+text(fit, use.n = TRUE)
+plot(fit2)
+text(fit2, use.n = TRUE)
 ```
+
+rpart with out data:
+```{r}
+fit_1 <- rpart(ELU ~  RIM, data = efficacy_summary)
+
+par(mfrow = c(1,2), xpd = TRUE); plot(fit_1); text(fit_1, use.n = TRUE)
+```
+
+
+
 
