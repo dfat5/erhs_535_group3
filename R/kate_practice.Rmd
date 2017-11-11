@@ -70,14 +70,14 @@ histogram_plot
 scatter_plot <- Cmax %>% 
   ggplot(aes(x = indep_measure, y = ELU, color = dose_int)) +
   geom_point(alpha = 0.5) +
-  geom_smooth(aes(color = NULL)) +
+  geom_smooth(method = lm, se = FALSE) +
   labs(x = "Independent variable", y = "Dependent Variable") +
   facet_wrap(~independent_var, scales = "free_x")
   
 scatter_plot
 ```
 ```{r}
-
+##Trying lm on one variable
 Caseum_binding <- Cmax %>% 
   filter(independent_var == "Caseum_binding") %>% 
   filter(dose_int == "BID") %>% 
@@ -94,16 +94,19 @@ tidy(Caseum_binding_mod)
 
 ```{r}
 #Univariate Models
-linear_model <- function(df = Cmax, indep_variable, dose_int) {
-  df <- df %>%
-    filter(independent_var == "indep_variable") %>% 
-    filter(dose_int == "dose_int") %>% 
-    select(ELU, indep_measure) 
+model_function <- function(df = Cmax, independent_var) {
+    model_results <- lm("ELU" ~ "independent_var")
 }
+```
 
-a <- linear_model(indep_variable = ICS, dose_int = BID)
-a
-
+```{r}
+test <- Cmax %>% 
+  group_by(independent_var, dose_int) %>% 
+  nest() %>% 
+  results <- purrr::map(model_function(independent_var = independent_var))
+  unnest()
+  
+  
 ```
 
 
