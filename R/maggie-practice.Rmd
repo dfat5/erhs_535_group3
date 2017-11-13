@@ -45,71 +45,15 @@ library(ggfortify)
 source("practice_data.R")
 
 ```
-```{r}
-Cmax <- efficacy_summary %>% 
-  filter(level == "Cmax") %>% 
-  gather(key = independent_var, value = indep_measure, -drug, -dosage, -dose_int, -level, -ELU, -ESP, na.rm = TRUE) %>% 
-  select(-ESP)
-
-head(Cmax)
-```
 
 
 ```{r}
-#histogram
-histogram_plot <- Cmax %>% 
-  ggplot(aes(x = indep_measure)) +
-  geom_histogram() +
-  labs(x = "Independent variable", y = "Dependent Variable") +
-  facet_wrap(~independent_var, scales = "free")
-  
-histogram_plot
+full_model <- lm(ELU ~ PLA + ULU + RIM + OCS + ICS + SLU + SLE + MIC_Erdman + MICserumErd + MIC_Rv + cLogP + huPPB + muPPB + Caseum_binding + MacUptake, data = efficacy_summary)
+
+full_model <- lm(ELU ~ PLA + ULU + RIM, data = efficacy_summary)
+
+model_foward <- step(full_model, direction = "forward", trace = 1)
 ```
-
-```{r fig.width=8, fig.height=6}
-scatter_plot <- Cmax %>% 
-  ggplot(aes(x = indep_measure, y = ELU, color = dose_int)) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(method = lm, se = FALSE) +
-  labs(x = "Independent variable", y = "Dependent Variable") +
-  facet_wrap(~independent_var, scales = "free_x")
-  
-scatter_plot
-```
-```{r}
-##Trying lm on one variable
-Caseum_binding <- Cmax %>% 
-  filter(independent_var == "Caseum_binding") %>% 
-  filter(dose_int == "BID") %>% 
-  select(ELU, indep_measure) 
- 
-Caseum_binding_mod <- lm(ELU ~ indep_measure, data = Caseum_binding)
-
-class(Caseum_binding_mod)
-names(Caseum_binding_mod)
-glance(Caseum_binding_mod)
-tidy(Caseum_binding_mod)
-
-```
-
-```{r}
-#Univariate Models
-model_function <- function(df = Cmax, independent_var) {
-    model_results <- lm("ELU" ~ "independent_var")
-}
-```
-
-```{r}
-test <- Cmax %>% 
-  group_by(independent_var, dose_int) %>% 
-  nest() %>% 
-  results <- purrr::map(model_function(independent_var = independent_var))
-  unnest()
-  
-  
-```
-
-
 
 
 
