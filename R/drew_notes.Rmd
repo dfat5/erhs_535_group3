@@ -9,8 +9,53 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readxl)
+library(randomForest)
+source("practice_data.R")
 
 ```
+ playing with randomForest package 
+ 
+
+ 
+ 
+```{r playing with Random forest tutorial}
+require(MASS)
+attach(Boston)
+set.seed(101)
+dim(Boston)
+
+#train sample 
+train=sample(1:nrow(Boston),300)
+
+#for tutorial using medv as the response variable 
+#and using 500 trees, medv(median house value).
+#using all other variables as predictor variables 
+
+Boston.rf=randomForest(medv ~ . , data = Boston , subset = train)
+Boston.rf
+
+plot(Boston.rf)
+```
+
+vignette("randomForest")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r importing example from excel and making graphs}
 cmax <- read_excel("data/DRUG_CLASS_I_Mean_Cmax_Trough_Efficacy_R_DATA_ANALYSIS.xlsx",
