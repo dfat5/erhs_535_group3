@@ -11,6 +11,7 @@ library(ggrepel)
 library(gghighlight)
 library(ggplot2)
 library(rpart)
+library(party)
 library(randomForest)
 library(ggthemes)
 source("practice_data.R")
@@ -137,25 +138,61 @@ plot_1 <- efficacy_summary_long %>%
 plot_1
 ```
 
+## rpart package
+[rpart1](https://www.statmethods.net/advstats/cart.html)
+[rpart2](https://cran.r-project.org/web/packages/rpart/rpart.pdf)
+
 Practice with rpart package:
 ```{r}
-fit <- rpart(Kyphosis ~ Age + Number + Start, data = kyphosis)
-fit2 <- rpart(Kyphosis ~ Age + Number + Start, data = kyphosis, 
-              parms = list(prior = c(0.65, 0.35), split = "information"))
-fit3 <- rpart(Kyphosis ~ Age + Number + Start, data=kyphosis, 
-              control = rpart.control(cp = 0.05))
-par(mfrow = c(1,2), xpd = TRUE)
-plot(fit)
-text(fit, use.n = TRUE)
-plot(fit2)
-text(fit2, use.n = TRUE)
+# grow tree 
+fit <- rpart(Kyphosis ~ Age + Number + Start,
+  	method="class", data=kyphosis)
+
+printcp(fit) # display the results 
+plotcp(fit) # visualize cross-validation results 
+summary(fit) # detailed summary of splits
+
+# plot tree 
+plot(fit, uniform=TRUE, 
+  	main="Classification Tree for Kyphosis")
+text(fit, use.n=TRUE, all=TRUE, cex=.8)
+
+# create attractive postscript plot of tree 
+#post(fit, file = "tree.ps", 
+#  	title = "Classification Tree for Kyphosis")
 ```
 
-rpart with out data:
+rpart and party with our data:
 ```{r}
-fit_1 <- rpart(ELU ~  RIM, data = efficacy_summary)
+## Remove missing outcome data
+efficacy_summary_2 <- efficacy_summary %>% 
+  filter(!is.na(ELU)) %>% 
+  filter(!is.na(ESP))
 
-par(mfrow = c(1,2), xpd = TRUE); plot(fit_1); text(fit_1, use.n = TRUE)
+## Trying rpart package:
+# PLA + ULU + RIM + OCS + ICS + SLU + SLE
+# cLogP + huPPB + muPPB + MIC_Erdman + MICserumErd + MIC_Rv + Caseum_binding + MacUptake
+fit_1 <- rpart(ELU ~  cLogP + huPPB + muPPB + MIC_Erdman + MICserumErd + 
+                 MIC_Rv + Caseum_binding + MacUptake + 
+                 PLA + ULU + RIM + OCS + ICS + SLU + SLE, 
+               data = efficacy_summary_2, method = "anova", 
+               control = rpart.control(cp = 0.01, minsplit = 4))
+
+printcp(fit_1) # display the results 
+plotcp(fit_1) # visualize cross-validation results 
+summary(fit_1) # detailed summary of splits
+
+par(mfrow = c(1,1.5), xpd = NA) # otherwise on some devices the text is clipped
+plot(fit_1, uniform=TRUE, 
+  	main="Classification Tree for ELU")
+text(fit_1, use.n=TRUE, all=TRUE, cex=.8)
+
+## Trying party package:
+fit_2 <- ctree(ELU ~  SLE + ICS + OCS + RIM + ULU + PLA + SLU, 
+               data = efficacy_summary_2)
+
+plot(fit_2, main="Conditional Inference Tree for ELU")
+
 ```
 
 
