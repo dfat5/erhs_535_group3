@@ -114,23 +114,32 @@ estimate_results
 ```
 #use forcat:fct_reorder to graph scatterplot of coefficients on x and indep_var on y
 
-```{r}
+```{r, fig.height = 4, fig.width = 7}
 #we are reordering the indep var by the estimate value maximum. 
 #bigger point size has less variance
-coef_plot <- estimate_results %>% 
-  mutate(independent_var = forcats::fct_reorder(independent_var, estimate, fun = max)) %>% 
-  ggplot(aes(x = estimate, y = independent_var, color = dose_int)) +
+coef_plot <- estimate_results %>%
+  mutate(independent_var = forcats::fct_reorder(independent_var, estimate, fun = max)) %>%
+  rename(Dose_Interval = dose_int) %>% 
+  ggplot(aes(x = estimate, y = independent_var, color = Dose_Interval)) +
   geom_point(aes(size = 1 / std.error)) +
-  theme_few()  
+  scale_size_continuous(guide = FALSE) +
+  theme_few() + 
+  ggtitle(label = "Linear model coefficients as function of independent variables, \n by drug dose and model uncertainty", subtitle = "smaller points have more uncertainty than larger points") +
+  geom_vline(xintercept = 0, color = "cornflower blue") 
 
 coef_plot
+
+
+# BID <- na.omit(new_est_results$BID)
+# QD <- na.omit(new_est_results$QD)
+# Ind_var <- unique(new_est_results$independent_var)
+# seg_data <- as.data.frame(cbind(BID, QD, Ind_var))
+# 
+# coef_plot + geom_segment(aes(data = seg_data, x = BID,
+#                              xend = QD, y = Ind_var, yend = Ind_var))
+
 ```
 #barbell plots or add geom_segment (x start and x end) 
-#size = 1 / variance
-#changing the size of the point based on the st. error
-#add reference line
-#remove point legend, make label
-
 
 #plot using beeswarm, the dependent variables (ELU and eSP across individual mice). many mouse replicates for each drug
 
