@@ -35,10 +35,62 @@ Boston.rf=randomForest(medv ~ . , data = Boston , subset = train)
 Boston.rf
 
 plot(Boston.rf)
+
+?randomForest
 ```
 
 vignette("randomForest")
+
+
+```{r tutorial from help file }
+
+data(iris)
+?set.seed
+#running ranndomForest Code
+iris.rf <- randomForest(Species ~ ., data=iris,
+                        importance=TRUE, proximity=TRUE)
+View(iris)
+print(iris.rf)
+
+#looking at variable importance 
+round(importance(iris.rf), 2)
+
+## Do MDS on 1 - proximity:
+iris.mds <- cmdscale(1 - iris.rf$proximity, eig=TRUE)
+op <- par(pty="s")
+pairs(cbind(iris[,1:4], iris.mds$points), cex=0.6, gap=0,
+      col=c("red", "green", "blue")[as.numeric(iris$Species)],
+      main="Iris Data: Predictors and MDS of Proximity Based on RandomForest")
+par(op)
+
+print(iris.mds$GOF)
+
+## Regresion
+
+data("airquality")
+set.seed(131)
+ozone.rf <- randomForest(Ozone ~ ., data=airquality,
+                         mtry=3,importance=TRUE,
+                         na.action=na.omit)
+print(ozone.rf)
+
+#show importance of variables
+#higher value mean more important
+
+round(importance(ozone.rf), 2)
+
+
+##playing with randomforst variable importance plot
+
+data(mtcars)
+mtcars.rf <- randomForest(mpg~ ., data = mtcars, 
+                          ntreee = 1000, 
+                          keep.forest =FALSE, 
+                          importance = TRUE)
+varImpPlot(mtcars.rf)
+
 ```
+
 
 
 
