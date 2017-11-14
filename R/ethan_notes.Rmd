@@ -14,6 +14,9 @@ library(rpart)
 library(party)
 library(randomForest)
 library(ggthemes)
+library(rattle)
+library(rpart.plot)
+library(RColorBrewer)
 source("practice_data.R")
 ```
 
@@ -141,6 +144,7 @@ plot_1
 ## rpart package
 [rpart1](https://www.statmethods.net/advstats/cart.html)
 [rpart2](https://cran.r-project.org/web/packages/rpart/rpart.pdf)
+[rpart example](https://gormanalysis.com/decision-trees-in-r-using-rpart/)
 
 Practice with rpart package:
 ```{r}
@@ -170,13 +174,15 @@ efficacy_summary_2 <- efficacy_summary %>%
   filter(!is.na(ESP))
 
 ## Trying rpart package:
+# drug + dosage + level
 # PLA + ULU + RIM + OCS + ICS + SLU + SLE
 # cLogP + huPPB + muPPB + MIC_Erdman + MICserumErd + MIC_Rv + Caseum_binding + MacUptake
-fit_1 <- rpart(ELU ~  cLogP + huPPB + muPPB + MIC_Erdman + MICserumErd + 
-                 MIC_Rv + Caseum_binding + MacUptake + 
-                 PLA + ULU + RIM + OCS + ICS + SLU + SLE, 
-               data = efficacy_summary_2, method = "anova", 
-               control = rpart.control(cp = 0.01, minsplit = 4))
+fit_1 <- rpart(ELU ~  drug + dosage + level + 
+                 PLA + ULU + RIM + OCS + ICS + SLU + SLE + 
+                 cLogP + huPPB + muPPB + MIC_Erdman + MICserumErd + MIC_Rv + 
+                 Caseum_binding + MacUptake,
+               data = efficacy_summary_2, 
+               control = rpart.control(cp = -1, minsplit = 4, minbucket = 1))
 
 printcp(fit_1) # display the results 
 plotcp(fit_1) # visualize cross-validation results 
@@ -186,6 +192,8 @@ par(mfrow = c(1,1.5), xpd = NA) # otherwise on some devices the text is clipped
 plot(fit_1, uniform=TRUE, 
   	main="Classification Tree for ELU")
 text(fit_1, use.n=TRUE, all=TRUE, cex=.8)
+#Make a fancy plot
+fancyRpartPlot(fit_1)
 
 ## Trying party package:
 fit_2 <- ctree(ELU ~  SLE + ICS + OCS + RIM + ULU + PLA + SLU, 

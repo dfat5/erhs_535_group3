@@ -50,7 +50,7 @@ Cmax <- efficacy_summary %>%
   filter(level == "Cmax") %>% 
   gather(key = independent_var, value = indep_measure, -drug, -dosage, -dose_int, -level, -ELU, -ESP, na.rm = TRUE) %>% 
   select(-ESP)
-
+#add in rename of indep_variables here
 head(Cmax)
 ```
 
@@ -77,40 +77,62 @@ scatter_plot <- Cmax %>%
 scatter_plot
 ```
 ```{r}
-##Trying lm on one variable
-Caseum_binding <- Cmax %>% 
-  filter(independent_var == "Caseum_binding") %>% 
-  filter(dose_int == "BID") %>% 
-  select(ELU, indep_measure) 
- 
-Caseum_binding_mod <- lm(ELU ~ indep_measure, data = Caseum_binding)
-
-class(Caseum_binding_mod)
-names(Caseum_binding_mod)
-glance(Caseum_binding_mod)
-tidy(Caseum_binding_mod)
+# ##Trying lm on one variable
+# Caseum_binding <- Cmax %>% 
+#   filter(independent_var == "Caseum_binding") %>% 
+#   filter(dose_int == "BID") %>% 
+#   select(ELU, indep_measure) 
+#  
+# Caseum_binding_mod <- lm(ELU ~ indep_measure, data = Caseum_binding)
+# 
+# class(Caseum_binding_mod)
+# names(Caseum_binding_mod)
+# glance(Caseum_binding_mod)
+# tidy(Caseum_binding_mod)
 
 ```
 
 ```{r}
 #Univariate Models
-model_function <- function(df = Cmax, independent_var) {
-    model_results <- lm("ELU" ~ "independent_var")
+#scale by independent measure: subtracting the mean value from the independent variable and dividing by the overall standard. that way the final mean is 0 and the st dv is 1. gives all variables a similar mean. that way the slope is comparable across everything
+model_function <- function(df) {
+    model_results <- lm(ELU ~ scale(indep_measure), data = df)
 }
 ```
 
 ```{r}
-test <- Cmax %>% 
+estimate_results <- Cmax %>% 
   group_by(independent_var, dose_int) %>% 
   nest() %>% 
-  results <- purrr::map(model_function(independent_var = independent_var))
-  unnest()
+  mutate(mod_results = purrr::map(data, model_function)) %>% 
+  mutate(mod_coefs = purrr::map(mod_results, broom::tidy)) %>% 
+  select(independent_var, dose_int, mod_results, mod_coefs) %>% 
+  unnest(mod_coefs) %>% 
+  filter(term == "scale(indep_measure)")
   
-  
+estimate_results
 ```
+#use forcat:fct_reorder to graph scatterplot of coefficients on x and indep_var on y
+
+```{r}
+#we are reordering the indep var by the estimate value maximum. 
+#bigger point size has less variance
+coef_plot <- estimate_results %>% 
+  mutate(independent_var = forcats::fct_reorder(independent_var, estimate, fun = max)) %>% 
+  ggplot(aes(x = estimate, y = independent_var, color = dose_int)) +
+  geom_point(aes(size = 1 / std.error)) +
+  theme_few()  
+
+coef_plot
+```
+#barbell plots or add geom_segment (x start and x end) 
+#size = 1 / variance
+#changing the size of the point based on the st. error
+#add reference line
+#remove point legend, make label
 
 
-
+#plot using beeswarm, the dependent variables (ELU and eSP across individual mice). many mouse replicates for each drug
 
 
 
