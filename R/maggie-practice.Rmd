@@ -33,11 +33,10 @@ library(readr)
 library(ggplot2)
 library(ggthemes)
 library(readxl)
-library(ggpmisc)
 library(broom)
 library(devtools)
 library(ggfortify)
-
+library(glmnet)
 ```
 
 ```{r}
@@ -56,5 +55,33 @@ model_foward <- step(full_model, direction = "forward", trace = 1)
 ```
 
 
+```{r}
+#install.packages("glmnet", repos = "http://cran.us.r-project.org")
+test_model <- efficacy_summary %>% 
+  select("ELU", "PLA") %>% 
+  transmute(x = "ELU", y = "PLA")
+test_model <- as.matrix(test_model)
+
+x <- efficacy_summary %>% 
+  select("PLA", "ULU", "RIM","OCS")
+x <- as.matrix(x)
+
+y <- efficacy_summary %>% 
+  select("ELU")
+y <- as.vector(y)
+y <- as.numeric(y)
+
+as.numeric(unlist(y))
+
+fit = glmnet(x, y)
+
+vignette("glmnet_beta",package = "glmnet")
+data("QuickStartExample", package = "glmnet")
+
+fit = glmnet(x, y)
+
+plot(fit, label = TRUE)
+coef(fit,s=0.1)
+```
 
 
