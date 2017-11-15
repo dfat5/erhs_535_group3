@@ -92,6 +92,25 @@ varImpPlot(mtcars.rf)
 ```
 
 
+```{r using random forest for our anaylsis }
+
+data(mtcars)
+mtcars.rf <- randomForest(mpg~ ., data = mtcars, 
+                          ntreee = 1000, 
+                          keep.forest =FALSE, 
+                          importance = TRUE)
+varImpPlot(mtcars.rf)
+
+
+
+test.rf <- randomForest(ELU ~ ., data = efficacy_summary, 
+                        na.action = na.pass,
+                        ntree= 500, 
+                        keep.forest = FALSE, 
+                        importance = TRUE)
+
+?randomForest
+```
 
 
 
@@ -105,8 +124,15 @@ varImpPlot(mtcars.rf)
 
 
 
+Notes about the data we are analyzing 
 
+all drugs testing are oral drugs 
+elu unevolved lung
+have drug penetration within various levels 
 
+go from outside to inside, measure the bacterial load and look at colony forming units 
+
+have rifomycin class drugs 
 
 
 ```{r importing example from excel and making graphs}
