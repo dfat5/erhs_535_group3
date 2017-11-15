@@ -129,19 +129,27 @@ coef_plot <- estimate_results %>%
 
 coef_plot
 
-
-# BID <- na.omit(new_est_results$BID)
-# QD <- na.omit(new_est_results$QD)
-# Ind_var <- unique(new_est_results$independent_var)
-# seg_data <- as.data.frame(cbind(BID, QD, Ind_var))
-# 
-# coef_plot + geom_segment(aes(data = seg_data, x = BID,
-#                              xend = QD, y = Ind_var, yend = Ind_var))
-
 ```
 #barbell plots or add geom_segment (x start and x end) 
 
-#plot using beeswarm, the dependent variables (ELU and eSP across individual mice). many mouse replicates for each drug
+#plot, the dependent variables (ELU and eSP across individual mice). many mouse replicates for each drug
 
+```{r}
+library(ggbeeswarm)
+str(clean_2_combined)
+head(clean_2_combined)
 
+ind_mouse_data <- clean_2_combined %>% 
+  select(drug, mouse_id, lung_efficacy) %>% 
+  mutate(drug = as.factor(drug)) %>% 
+  mutate(mouse_id = as.factor(mouse_id)) %>% 
+  group_by(drug) 
+  
+beeswarm <- ind_mouse_data %>%   
+  ggplot(aes(x = drug, y = lung_efficacy, color = mouse_id)) +
+  geom_beeswarm()
+  
 
+```
+
+#Try making individual functions for each plot
