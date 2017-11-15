@@ -130,9 +130,8 @@ coef_plot <- estimate_results %>%
 coef_plot
 
 ```
-#barbell plots or add geom_segment (x start and x end) 
 
-#plot, the dependent variables (ELU and eSP across individual mice). many mouse replicates for each drug
+#plot, the dependent variables (ELU  across individual mice). many mouse replicates for each drug
 
 ```{r}
 library(ggbeeswarm)
@@ -145,10 +144,13 @@ ind_mouse_data <- clean_2_combined %>%
   mutate(mouse_id = as.factor(mouse_id)) %>% 
   group_by(drug) 
   
-beeswarm <- ind_mouse_data %>%   
+ind_mouse_plot <- ind_mouse_data %>%   
   ggplot(aes(x = drug, y = lung_efficacy, color = mouse_id)) +
-  geom_beeswarm()
+  geom_beeswarm() +
+  ylab("Colony Forming Units") +
+  theme_few()
   
+ind_mouse_plot
 
 ```
 
