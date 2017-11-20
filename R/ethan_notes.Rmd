@@ -1,7 +1,7 @@
 ---
 title: "Ethan Notes and Examples"
 author: "Ethan Walker"
-date: "November 11, 2017"
+date: "November 20, 2017"
 output: html_document
 ---
 ```{r, include=FALSE}
@@ -166,7 +166,7 @@ text(fit, use.n=TRUE, all=TRUE, cex=.8)
 #  	title = "Classification Tree for Kyphosis")
 ```
 
-rpart and party with our data:
+rpart with our data:
 ```{r}
 ## Remove missing outcome data
 efficacy_summary_2 <- efficacy_summary %>% 
@@ -182,7 +182,13 @@ fit_1 <- rpart(ELU ~  drug + dosage + level +
                  cLogP + huPPB + muPPB + MIC_Erdman + MICserumErd + MIC_Rv + 
                  Caseum_binding + MacUptake,
                data = efficacy_summary_2, 
-               control = rpart.control(cp = -1, minsplit = 4, minbucket = 1))
+               control = rpart.control(cp = -1, minsplit = 8, minbucket = 1))
+  # minsplit: min # of obs for a split to be attempted
+  # minbucket: min # obs in any terminal node
+  # cp = complexity parameter: a split must increase overall fit by cp (neg value trys all)
+
+#Make a fancy plot
+fancyRpartPlot(fit_1)
 
 printcp(fit_1) # display the results 
 plotcp(fit_1) # visualize cross-validation results 
@@ -192,8 +198,7 @@ par(mfrow = c(1,1.5), xpd = NA) # otherwise on some devices the text is clipped
 plot(fit_1, uniform=TRUE, 
   	main="Classification Tree for ELU")
 text(fit_1, use.n=TRUE, all=TRUE, cex=.8)
-#Make a fancy plot
-fancyRpartPlot(fit_1)
+
 
 ## Trying party package:
 fit_2 <- ctree(ELU ~  SLE + ICS + OCS + RIM + ULU + PLA + SLU, 
@@ -203,6 +208,44 @@ plot(fit_2, main="Conditional Inference Tree for ELU")
 
 ```
 
+function using rpart and various options:
+```{r}
+regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summary) {
+  
+  if (dep_var == "ELU") {
+    
+  function_data <- data %>%
+    filter(!is.na(ELU))
+  
+  tree <- rpart(ELU ~  drug + dosage + level + 
+                 PLA + ULU + RIM + OCS + ICS + SLU + SLE + 
+                 cLogP + huPPB + muPPB + MIC_Erdman + MICserumErd + MIC_Rv + 
+                 Caseum_binding + MacUptake,
+               data = function_data, 
+               control = rpart.control(cp = -1, minsplit = min_split, 
+                                       minbucket = min_bucket))
+  }
+  
+  if (dep_var == "ESP") {
+    
+  function_data <- data %>%
+    filter(!is.na(ESP))
+  
+  tree <- rpart(ESP ~  drug + dosage + level + 
+                 PLA + ULU + RIM + OCS + ICS + SLU + SLE + 
+                 cLogP + huPPB + muPPB + MIC_Erdman + MICserumErd + MIC_Rv + 
+                 Caseum_binding + MacUptake,
+               data = function_data, 
+               control = rpart.control(cp = -1, minsplit = min_split, 
+                                       minbucket = min_bucket))
+  }
+  
+  fancyRpartPlot(tree)
+}
+```
 
-
+Test regression_tree function:
+```{r}
+regression_tree(dep_var = "ELU", min_split = 6, min_bucket = 4)
+```
 
