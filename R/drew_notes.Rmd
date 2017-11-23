@@ -90,26 +90,50 @@ mtcars.rf <- randomForest(mpg~ ., data = mtcars,
 varImpPlot(mtcars.rf)
 
 ```
-
+Using RandomForest package want to determine which variables are the most important and make plot dislaying which variabels are good predictors of ELU, so need to select good predictor variables. 
+After converting all varaibles to either factor or numeric, 
 
 ```{r using random forest for our anaylsis }
 
-data(mtcars)
-mtcars.rf <- randomForest(mpg~ ., data = mtcars, 
-                          ntreee = 1000, 
-                          keep.forest =FALSE, 
-                          importance = TRUE)
-varImpPlot(mtcars.rf)
+efficacy_sumrf <- efficacy_summary %>% 
+  select(-ESP) %>% 
+  mutate(huPPB = as.numeric(huPPB), 
+         muPPB = as.numeric(muPPB), 
+         dosage = as.factor(dosage), 
+         dose_int = as.factor(dose_int), 
+         level = as.factor(level), 
+         drug = as.factor(drug))
 
+str(efficacy_sumrf)
 
-
-test.rf <- randomForest(ELU ~ ., data = efficacy_summary, 
-                        na.action = na.pass,
+#nunmber of predictors (mtry = 20/3 = 6.3, try mtry with 3 and mtry with 12 )
+efficacy.rf <- randomForest( ELU~ ., data = efficacy_sumrf,
+              na.action = na.roughfix,
                         ntree= 500, 
-                        keep.forest = FALSE, 
                         importance = TRUE)
 
-?randomForest
+efficacy.rf2 <- randomForest( ELU~ ., data = efficacy_sumrf,
+              na.action = na.roughfix,
+              mtry = 3,
+                        ntree= 500, 
+                        importance = TRUE)
+
+efficacy.rf3 <- randomForest( ELU~ ., data = efficacy_sumrf,
+              na.action = na.roughfix,
+              mtry = 3,
+                        ntree= 500, 
+                        importance = TRUE)
+
+print(efficacy.rf)
+print(efficacy.rf2)
+print(efficacy.rf3)
+
+#looking at data leave mtry as default because it has the best %var explained 
+
+varImpPlot(efficacy.rf)
+varImpPlot(efficacy.rf2)
+varImpPlot(efficacy.rf3)
+
 ```
 
 
