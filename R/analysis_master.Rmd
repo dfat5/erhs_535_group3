@@ -1,7 +1,7 @@
 ---
 title: "Analysis Master"
-author: "Ethan Walker"
-date: "November 1, 2017"
+author: "Kate, Maggie, Drew, Ethan"
+date: "November 27, 2017"
 output: html_document
 ---
 
@@ -10,6 +10,14 @@ library(readxl)
 library(tidyverse)
 library(ggrepel)
 library(gghighlight)
+library(ggplot2)
+library(rpart)
+library(party)
+library(randomForest)
+library(ggthemes)
+library(rattle)
+library(rpart.plot)
+library(RColorBrewer)
 source("practice_data.R")
 ```
 
@@ -20,4 +28,53 @@ discover if there are characteristics of the drugs that are associated
 with effectiveness against TB. This group will need to come up with
 ways (and code) to analyze that in the data. This might include
 generalized linear models, scatterplots, and possibly other supervised
-learning methods.
+learning methods.  
+
+
+##Regression Tree Function (Ethan):
+```{r}
+regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summary) {
+  
+  if (dep_var == "ELU") {
+    
+  function_data <- data %>%
+    filter(!is.na(ELU))
+  
+  tree <- rpart(ELU ~  drug + dosage + level + 
+                 PLA + ULU + RIM + OCS + ICS + SLU + SLE + 
+                 cLogP + huPPB + muPPB + MIC_Erdman + MICserumErd + MIC_Rv + 
+                 Caseum_binding + MacUptake,
+               data = function_data, 
+               control = rpart.control(cp = -1, minsplit = min_split, 
+                                       minbucket = min_bucket))
+  }
+  
+  if (dep_var == "ESP") {
+    
+  function_data <- data %>%
+    filter(!is.na(ESP))
+  
+  tree <- rpart(ESP ~  drug + dosage + level + 
+                 PLA + ULU + RIM + OCS + ICS + SLU + SLE + 
+                 cLogP + huPPB + muPPB + MIC_Erdman + MICserumErd + MIC_Rv + 
+                 Caseum_binding + MacUptake,
+               data = function_data, 
+               control = rpart.control(cp = -1, minsplit = min_split, 
+                                       minbucket = min_bucket))
+  }
+  
+  fancyRpartPlot(tree)
+}
+```
+
+###Testing regression_tree function:
+```{r}
+#dep_var options: "ELU" (lung efficacy) or "ESP" (spleen efficacy)
+#min_split: numeric input indicating minimum # observations for a split to be attempted
+#min_bucket: numeric input indicating minimum # observations in a terminal node
+regression_tree(dep_var = "ELU", min_split = 6, min_bucket = 4)
+```
+Interpretation:
+
+The number at the top of each node is indicating the mean of the outcome variable for the observations in that node (mean of 1.5 for node 1). Below each node is indicating what each split was based on. Splits are chosen based on a complexity parameter. Starting from node 1, the first split is made so that it leads to the greatest possible reduction in RSS. Node 3 is a terminal node because it only has 4 observations, which was the minimum number of observations a node can have to be considered (set in our function parameters). Given the 16 observations in node 2, another split is made that again gives the greatest possible reduction in RSS. This process continues until either the min_split or the min_bucket parameters are fulfilled for each node from the preset function parameters. 
+
