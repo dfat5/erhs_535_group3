@@ -5,7 +5,7 @@ date: "11/1/2017"
 output: word_document
 ---
 
-Modelling dependent~independent variables to determine variables associated with drug efficacy against TB. Dependent Variables are ELU (efficacy in the lungs) and ESP (efficacy in the spleen). SPleen and lung are the main outcome variables. Cmax and Trough indicate different drug concentrations and values are averaged across many mice at different drug doseages. Dependent variables include biologic and chemical (in vitro) measures. 
+Modelling dependent~independent variables to determine variables associated with drug efficacy against TB. Dependent Variables are ELU (efficacy in the lungs) and ESP (efficacy in the spleen). leen and lung are the main outcome variables. Cmax and Trough indicate different drug concentrations and values are averaged across many mice at different drug doseages. Dependent variables include biologic and chemical (in vitro) measures. 
 
 Extensions to 'ggplot2' respecting the grammar of graphics
 paradigm. Provides new statistics to locate and tag peaks and valleys in 2D
@@ -54,19 +54,9 @@ Cmax <- efficacy_summary %>%
 head(Cmax)
 ```
 
-
-```{r}
-#histogram
-histogram_plot <- Cmax %>% 
-  ggplot(aes(x = indep_measure)) +
-  geom_histogram() +
-  labs(x = "Independent variable", y = "Dependent Variable") +
-  facet_wrap(~independent_var, scales = "free")
-  
-histogram_plot
-```
-
 ```{r fig.width=8, fig.height=6}
+#Scatterplot function- input dataframe, select what y is, cmax or trough, and then it returns the scatterplot
+#this is set up for drug doseages are tied to the interval
 scatter_plot <- Cmax %>% 
   ggplot(aes(x = indep_measure, y = ELU, color = dose_int)) +
   geom_point(alpha = 0.5) +
@@ -76,21 +66,7 @@ scatter_plot <- Cmax %>%
   
 scatter_plot
 ```
-```{r}
-# ##Trying lm on one variable
-# Caseum_binding <- Cmax %>% 
-#   filter(independent_var == "Caseum_binding") %>% 
-#   filter(dose_int == "BID") %>% 
-#   select(ELU, indep_measure) 
-#  
-# Caseum_binding_mod <- lm(ELU ~ indep_measure, data = Caseum_binding)
-# 
-# class(Caseum_binding_mod)
-# names(Caseum_binding_mod)
-# glance(Caseum_binding_mod)
-# tidy(Caseum_binding_mod)
 
-```
 
 ```{r}
 #Univariate Models
@@ -101,6 +77,7 @@ model_function <- function(df) {
 ```
 
 ```{r}
+#model function to output table
 estimate_results <- Cmax %>% 
   group_by(independent_var, dose_int) %>% 
   nest() %>% 
@@ -134,6 +111,7 @@ coef_plot
 #plot, the dependent variables (ELU  across individual mice). many mouse replicates for each drug
 
 ```{r}
+#individual mouse function
 library(ggbeeswarm)
 str(clean_2_combined)
 head(clean_2_combined)
@@ -143,15 +121,16 @@ ind_mouse_data <- clean_2_combined %>%
   mutate(drug = as.factor(drug)) %>% 
   mutate(mouse_id = as.factor(mouse_id)) %>% 
   group_by(drug) 
+  #Add mutate true or false logical statement if outside IQR
   
 ind_mouse_plot <- ind_mouse_data %>%   
-  ggplot(aes(x = drug, y = lung_efficacy, color = mouse_id)) +
+  ggplot(aes(x = drug, y = lung_efficacy)) +
   geom_beeswarm() +
   ylab("Colony Forming Units") +
   theme_few()
   
 ind_mouse_plot
-
+#Group by each drug and label for points outside IQR. then use Geomhighlight (and geomrepel (used in place of geomtext) to add on which mouse it was 
 ```
 
 #Try making individual functions for each plot
