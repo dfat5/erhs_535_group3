@@ -16,28 +16,86 @@ source("practice_data.R")
  playing with randomForest package 
  
 
+Using RandomForest package want to determine which variables are the most important and make plot dislaying which variabels are good predictors of ELU, so need to select good predictor variables. 
+After converting all varaibles to either factor or numeric, 
+
+```{r using random forest for our anaylsis }
+
+efficacy_sumrf <- efficacy_summary %>% 
+  select(-ESP) %>% 
+  mutate(huPPB = as.numeric(huPPB), 
+         muPPB = as.numeric(muPPB), 
+         dosage = as.factor(dosage), 
+         dose_int = as.factor(dose_int), 
+         level = as.factor(level), 
+         drug = as.factor(drug))
+
+str(efficacy_sumrf)
+
+#nunmber of predictors (mtry = 20/3 = 6.3, try mtry with 3 and mtry with 12 )
+efficacy.rf <- randomForest( ELU~ ., data = efficacy_sumrf,
+              na.action = na.roughfix,
+                        ntree= 1000, 
+                        importance = TRUE)
+
+efficacy.rf2 <- randomForest( ELU~ ., data = efficacy_sumrf,
+              na.action = na.roughfix,
+              mtry = 3,
+                        ntree= 500, 
+                        importance = TRUE)
+
+efficacy.rf3 <- randomForest( ELU~ ., data = efficacy_sumrf,
+              na.action = na.roughfix,
+              mtry = 3,
+                        ntree= 500, 
+                        importance = TRUE)
+
+print(efficacy.rf)
+print(efficacy.rf2)
+print(efficacy.rf3)
+
+#looking at data leave mtry as default because it has the best %var explained 
+
+varImpPlot(efficacy.rf)
+varImpPlot(efficacy.rf2)
+varImpPlot(efficacy.rf3)
+
+?randomForest
+
+```
+ notes: use %incMSE and export to ggplot to make a prettier graph! also in your report specify what is being specified and what is not being speciefied ie mtry etc. 
+ MSE is mean decrease in accuracy 
+ 
+also maybe do doseage so you can check dosage 
+ 
+ 
  
  
 ```{r playing with Random forest tutorial}
-require(MASS)
-attach(Boston)
-set.seed(101)
-dim(Boston)
+print(efficacy.rf)
 
-#train sample 
-train=sample(1:nrow(Boston),300)
+graph <-importance(efficacy.rf, type = 1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  rename(variable = rowname, 
+         mse = `%IncMSE`)
 
-#for tutorial using medv as the response variable 
-#and using 500 trees, medv(median house value).
-#using all other variables as predictor variables 
+graph %>% 
+  filter(mse > 0) %>% 
+  ggplot()+
+  geom_point(aes(x = mse, y = reorder(variable, mse)))+
+  theme_minimal()+
+  labs(y = "Variable", 
+       x = "Importance")
 
-Boston.rf=randomForest(medv ~ . , data = Boston , subset = train)
-Boston.rf
+?select
+?data_frame
 
-plot(Boston.rf)
+?as.data.frame()
 
-?randomForest
 ```
+
+
 
 vignette("randomForest")
 
@@ -90,51 +148,7 @@ mtcars.rf <- randomForest(mpg~ ., data = mtcars,
 varImpPlot(mtcars.rf)
 
 ```
-Using RandomForest package want to determine which variables are the most important and make plot dislaying which variabels are good predictors of ELU, so need to select good predictor variables. 
-After converting all varaibles to either factor or numeric, 
 
-```{r using random forest for our anaylsis }
-
-efficacy_sumrf <- efficacy_summary %>% 
-  select(-ESP) %>% 
-  mutate(huPPB = as.numeric(huPPB), 
-         muPPB = as.numeric(muPPB), 
-         dosage = as.factor(dosage), 
-         dose_int = as.factor(dose_int), 
-         level = as.factor(level), 
-         drug = as.factor(drug))
-
-str(efficacy_sumrf)
-
-#nunmber of predictors (mtry = 20/3 = 6.3, try mtry with 3 and mtry with 12 )
-efficacy.rf <- randomForest( ELU~ ., data = efficacy_sumrf,
-              na.action = na.roughfix,
-                        ntree= 500, 
-                        importance = TRUE)
-
-efficacy.rf2 <- randomForest( ELU~ ., data = efficacy_sumrf,
-              na.action = na.roughfix,
-              mtry = 3,
-                        ntree= 500, 
-                        importance = TRUE)
-
-efficacy.rf3 <- randomForest( ELU~ ., data = efficacy_sumrf,
-              na.action = na.roughfix,
-              mtry = 3,
-                        ntree= 500, 
-                        importance = TRUE)
-
-print(efficacy.rf)
-print(efficacy.rf2)
-print(efficacy.rf3)
-
-#looking at data leave mtry as default because it has the best %var explained 
-
-varImpPlot(efficacy.rf)
-varImpPlot(efficacy.rf2)
-varImpPlot(efficacy.rf3)
-
-```
 
 
 
