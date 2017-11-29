@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readxl)
 library(randomForest)
+library(ggthemes)
 source("practice_data.R")
 
 ```
@@ -78,7 +79,8 @@ graph <-importance(efficacy.rf, type = 1) %>%
   as.data.frame() %>% 
   rownames_to_column() %>% 
   rename(variable = rowname, 
-         mse = `%IncMSE`)
+         mse = `%IncMSE`) 
+
 
 graph %>% 
   filter(mse > 0) %>% 
@@ -98,6 +100,82 @@ graph %>%
 
 
 vignette("randomForest")
+
+
+```{r writting function}
+
+best_variables <- function(dep_var, df = efficacy_summary){
+  
+  if(dep_var == "ELU"){
+  dataset <- df %>% 
+    select(-ESP) %>% 
+    mutate(huPPB = as.numeric(huPPB), 
+         muPPB = as.numeric(muPPB), 
+         dosage = as.factor(dosage), 
+         dose_int = as.factor(dose_int), 
+         level = as.factor(level), 
+         drug = as.factor(drug))
+
+efficacy.rf <- randomForest( ELU~ ., data =dataset,
+              na.action = na.roughfix,
+                        ntree= 1000, 
+                        importance = TRUE)
+  }
+  
+  if (dep_var == "ESP"){
+    dataset <- df %>% 
+      select(-ELU) %>% 
+    mutate(huPPB = as.numeric(huPPB), 
+         muPPB = as.numeric(muPPB), 
+         dosage = as.factor(dosage), 
+         dose_int = as.factor(dose_int), 
+         level = as.factor(level), 
+         drug = as.factor(drug))
+
+efficacy.rf <- randomForest( ESP ~ ., data =dataset,
+              na.action = na.roughfix,
+                        ntree= 1000, 
+                        importance = TRUE)
+  }
+  
+graph <-importance(efficacy.rf, type = 1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  rename(variable = rowname, 
+         mse = `%IncMSE`) 
+
+
+graph %>% 
+  filter(mse > 0) %>% 
+  ggplot()+
+  geom_point(aes(x = mse, y = reorder(variable, mse)))+
+  theme_minimal()+
+  labs(y = "Variable", 
+       x = "Importance")
+
+
+
+  
+}
+
+```
+
+
+
+```{r testing function}
+
+
+best_variables("ELU")
+best_variables("ESP")
+
+```
+
+
+
+
+
+
+
 
 
 ```{r tutorial from help file }
