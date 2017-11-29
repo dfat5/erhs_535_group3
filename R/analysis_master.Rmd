@@ -34,6 +34,37 @@ ways (and code) to analyze that in the data. This might include
 generalized linear models, scatterplots, and possibly other supervised
 learning methods.  
 
+###Visualize univariate variables by dose in a scatterplot function
+```{r}
+univar_plot <- function(peak_trough, dep_var, data = efficacy_summary) {
+ 
+  function_data <- data %>% 
+  filter(level == peak_trough) %>% 
+  gather(key = independent_var, value = indep_measure, -drug, -dosage, -dose_int, -level, -ELU, -ESP, na.rm = TRUE) %>% 
+  select(drug, dosage, dose_int, level, dep_var, indep_measure, independent_var) 
+  
+  if(dep_var=="ELU") {vect <- function_data$ELU}
+  if(dep_var=="ESP") {vect <- function_data$ESP}
+        
+  scatter_plot <- function_data %>%
+  ggplot(aes(x = indep_measure, y = vect, color = dose_int)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = lm, se = FALSE) +
+  labs(x = "Independent variable", y = "Dependent Variable") +
+  facet_wrap(~independent_var, scales = "free_x")
+
+scatter_plot
+  }
+
+univar_plot(peak_trough = "Cmax", dep_var = "ELU")
+```
+
+##The user specifies wether the dependent variable they are interested in is ELU or ESP. They also specify the level (Cmax or Trough). The scatterplot defines the independent variable on the x axis, and dependent variable (ELU or ESP, depending on what is specified in the function), and colors it by dose (which is tied to the dose interval)
+
+
+##Fitting Linear Models Function (Kate)
+
+
 
 ##Regression Tree Function (Ethan):
 ```{r}
@@ -120,7 +151,6 @@ LASSO_model("ELU", 100)
 Interpretation:  
 
 This function outputs raw coefficents and an intercept on an penalized maximum likelihood model. Models dropped from the model are represented with zeros. IT computes a LASSO penalty for small coeff and drops them, resulting in only the coef with the most leverage remaining.  
-
 
 
 ## RandomForest Function (Drew)
