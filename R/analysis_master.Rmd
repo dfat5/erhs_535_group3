@@ -55,14 +55,44 @@ univar_plot <- function(peak_trough, dep_var, data = efficacy_summary) {
 
 scatter_plot
   }
-
-univar_plot(peak_trough = "Cmax", dep_var = "ELU")
 ```
 
 ##The user specifies wether the dependent variable they are interested in is ELU or ESP. They also specify the level (Cmax or Trough). The scatterplot defines the independent variable on the x axis, and dependent variable (ELU or ESP, depending on what is specified in the function), and colors it by dose (which is tied to the dose interval)
 
 
 ##Fitting Linear Models Function (Kate)
+```{r}
+#Define the linear model function
+
+linear_model <- function(peak_trough, dep_var, data = efficacy_summary) {
+  
+function_data <- data %>% 
+  filter(level == peak_trough) %>% 
+  gather(key = independent_var, value = indep_measure, -drug, -dosage, -dose_int, -level, -ELU, -ESP, na.rm = TRUE) %>% 
+  select(drug, dosage, dose_int, level, dep_var, indep_measure, independent_var) 
+  
+  if(dep_var=="ELU") {vect <- function_data$ELU}
+  if(dep_var=="ESP") {vect <- function_data$ESP}
+  
+  model_function <- function(data) {
+    model_results <- lm(vect ~ scale(indep_measure), data = function_data)
+  }
+  
+estimate_results <- function_data %>% 
+  group_by(independent_var, dose_int) %>% 
+  nest() %>% 
+  mutate(mod_results = purrr::map(function_data, model_function)) %>% 
+  mutate(mod_coefs = purrr::map(mod_results, broom::tidy)) %>% 
+  select(independent_var, dose_int, mod_results, mod_coefs) %>% 
+  unnest(mod_coefs) %>% 
+  filter(term == "scale(indep_measure)")
+  
+estimate_results
+
+}
+
+test_2 <- linear_model(peak_trough = "Cmax", dep_var = "ELU", data = efficacy_summary)
+```
 
 
 
@@ -112,7 +142,6 @@ regression_tree(dep_var = "ELU", min_split = 6, min_bucket = 4)
 Interpretation:  
 
 The number at the top of each node is indicating the mean of the outcome variable for the observations in that node (mean of 1.5 for node 1). Below each node is indicating what each split was based on. Splits are chosen based on a complexity parameter. Starting from node 1, the first split is made so that it leads to the greatest possible reduction in RSS. Node 3 is a terminal node because it only has 4 observations, which was the minimum number of observations a node can have to be considered (set in our function parameters). Given the 16 observations in node 2, another split is made that again gives the greatest possible reduction in RSS. This process continues until either the min_split or the min_bucket parameters are fulfilled for each node from the preset function parameters.  
-
 
 
 ##LASSO Function (Maggie):
