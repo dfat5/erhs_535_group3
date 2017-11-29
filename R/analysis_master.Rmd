@@ -15,6 +15,7 @@ library(rpart)
 library(randomForest)
 library(ggthemes)
 library(glmnet)
+library(knitr)
 source("practice_data.R")
 
 ```
@@ -179,7 +180,8 @@ colnames(coeff) <- c("predictor", "coeff")
 
 coeff <- coeff %>% 
   filter(coeff > 0) 
-coeff
+coeff %>% 
+  kable()
 }
 ```
 
