@@ -190,6 +190,9 @@ The user specifies which dependent variable they would like to use (either ELU o
 
 best_variables <- function(dep_var, df = efficacy_summary){
   
+  
+  title <- paste0 ("Predicing Variable Importance Using ", as.character(dep_var))
+  
   if(dep_var == "ELU"){
   dataset <- df %>% 
     select(-ESP) %>% 
@@ -229,11 +232,13 @@ graph <-importance(efficacy.rf, type = 1) %>%
          mse = `%IncMSE`) 
 
 
+
 graph %>% 
   filter(mse > 0) %>% 
   ggplot()+
   geom_point(aes(x = mse, y = reorder(variable, mse)))+
   theme_minimal()+
+  ggtitle(title)+
   labs(y = "Variable", 
        x = "Importance")
 }
