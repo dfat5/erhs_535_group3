@@ -10,8 +10,6 @@ output:
 ```{r, include=FALSE}
 library(readxl)
 library(tidyverse)
-library(ggrepel)
-library(gghighlight)
 library(ggplot2)
 library(rpart)
 library(randomForest)
