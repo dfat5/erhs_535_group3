@@ -57,7 +57,7 @@ scatter_plot
 
 ```
 
-##The user specifies wether the dependent variable they are interested in is ELU or ESP. They also specify the level (Cmax or Trough). The scatterplot defines the independent variable on the x axis, and dependent variable (ELU or ESP, depending on what is specified in the function), and colors it by dose (which is tied to the dose interval)
+##The user specifies wether the dependent variable they are interested in is ELU or ESP. They also specify the level (Cmax or Trough). The scatterplot defines the independent variable on the x axis, and dependent variable (ELU or ESP). The faceted plot is colored by dose (which is also tied to the dose interval)
 
 
 ##Fitting Linear Models Function (Kate)
