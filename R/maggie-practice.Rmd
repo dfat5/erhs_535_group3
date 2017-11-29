@@ -1,8 +1,4 @@
----
-title: "univariate models"
-author: "Kate Huebner"
-date: "11/1/2017"
-output: word_document
+
 ---
 
 Modelling dependent~independent variables to determine variables associated with drug efficacy against TB. Dependent Variables are ELU (efficacy in the lungs) and ESP (efficacy in the spleen). SPleen and lung are the main outcome variables. Cmax and Trough indicate different drug concentrations and values are averaged across many mice at different drug doseages. Dependent variables include biologic and chemical (in vitro) measures. 
@@ -56,32 +52,49 @@ model_foward <- step(full_model, direction = "forward", trace = 1)
 
 
 ```{r}
-#install.packages("glmnet", repos = "http://cran.us.r-project.org")
-test_model <- efficacy_summary %>% 
-  select("ELU", "PLA") %>% 
-  transmute(x = "ELU", y = "PLA")
-test_model <- as.matrix(test_model)
+efficacy_summary <- na.omit(efficacy_summary) %>% 
+  select_if(is.numeric)
 
-x <- efficacy_summary %>% 
-  select("PLA", "ULU", "RIM","OCS")
-x <- as.matrix(x)
-
-y <- efficacy_summary %>% 
+response <- efficacy_summary %>% 
   select("ELU")
-y <- as.vector(y)
-y <- as.numeric(y)
 
-as.numeric(unlist(y))
+predictors <- subset(efficacy_summary, select = -ELU)
 
-fit = glmnet(x, y)
-
-vignette("glmnet_beta",package = "glmnet")
-data("QuickStartExample", package = "glmnet")
+y <- as.numeric(unlist(response))
+x <- as.matrix(predictors)
 
 fit = glmnet(x, y)
 
-plot(fit, label = TRUE)
-coef(fit,s=0.1)
+#plot(fit, label = TRUE)
+coeff <- coef(fit,s=0.1)
+coeff <- as.data.frame(as.matrix(coeff)) 
+coeff 
 ```
+
+```{r doesnt_work}
+LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
+  data <- na.omit(df) %>% 
+  select_if(is.numeric) %>%
+  filter(dosage == dose)
+
+response <- df %>% 
+  select(dep_var)
+
+predictors <- df %>%
+  select(c("PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "cLogP", "huPPB", "muPPB", "MIC_Erdman", 'MICserumErd', "MIC_Rv", "Caseum_binding", "MacUptake"))
+
+y <- as.numeric(unlist(response))
+x <- as.matrix(predictors)
+
+fit = glmnet(x, y)
+
+coeff <- coef(fit,s=0.1)
+coeff <- as.data.frame(as.matrix(coeff))
+coeff 
+}
+
+LASSO_model("ELU", 100)
+```
+
 
 
