@@ -115,5 +115,5 @@ LASSO_model("ELU", 100)
 ```
 Interpretation:
 
-LASSO
+This function outputs raw coefficents and an intercept on an penalized maximum likelihood model. Models dropped from the model are represented with zeros. IT computes a LASSO penalty for small coeff and drops them, resulting in only the coef with the most leverage remaining. 
 
