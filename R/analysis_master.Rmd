@@ -10,21 +10,17 @@ output:
 ```{r, include=FALSE}
 library(readxl)
 library(tidyverse)
-library(ggrepel)
-library(gghighlight)
 library(ggplot2)
 library(rpart)
 library(randomForest)
 library(ggthemes)
-library(rattle)
-library(rpart.plot)
-library(RColorBrewer)
 library(glmnet)
 source("practice_data.R")
 
 ```
 
-#Association between dependent and independent variables:  
+#Association between dependent and indeShow in New WindowClear OutputExpand/Collapse Output
+pendent variables:  
 Create summaries and visualizations of how the dependent variable is
 associated with different independent variables. Here, we will try to
 discover if there are characteristics of the drugs that are associated
@@ -128,7 +124,10 @@ regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summ
                                        minbucket = min_bucket))
   }
   
-  fancyRpartPlot(tree)
+  par(mfrow = c(1,1.5), xpd = NA) # otherwise on some devices the text is clipped
+  plot(tree, uniform=TRUE, 
+  	main="Classification Tree")
+  text(tree, use.n=TRUE, all=TRUE, cex=.8)
 }
 ```
 
@@ -137,7 +136,7 @@ regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summ
 #dep_var options: "ELU" (lung efficacy) or "ESP" (spleen efficacy)
 #min_split: numeric input indicating minimum # observations for a split to be attempted
 #min_bucket: numeric input indicating minimum # observations in a terminal node
-regression_tree(dep_var = "ELU", min_split = 6, min_bucket = 4)
+regression_tree(dep_var = "ELU", min_split = 8, min_bucket = 4)
 ```
 Interpretation:  
 
@@ -163,8 +162,13 @@ x <- as.matrix(predictors)
 fit = glmnet(x, y)
 
 coeff <- coef(fit,s=0.1)
-coeff <- as.data.frame(as.matrix(coeff))
-coeff 
+coeff <- as.data.frame(as.matrix(coeff)) %>% 
+rownames_to_column() 
+colnames(coeff) <- c("predictor", "coeff")
+
+coeff <- coeff %>% 
+  filter(coeff > 0) 
+coeff
 }
 ```
 
@@ -190,6 +194,9 @@ The user specifies which dependent variable they would like to use (either ELU o
 
 
 best_variables <- function(dep_var, df = efficacy_summary){
+  
+  
+  title <- paste0 ("Predicing Variable Importance Using ", as.character(dep_var))
   
   if(dep_var == "ELU"){
   dataset <- df %>% 
@@ -230,11 +237,13 @@ graph <-importance(efficacy.rf, type = 1) %>%
          mse = `%IncMSE`) 
 
 
+
 graph %>% 
   filter(mse > 0) %>% 
   ggplot()+
   geom_point(aes(x = mse, y = reorder(variable, mse)))+
   theme_minimal()+
+  ggtitle(title)+
   labs(y = "Variable", 
        x = "Importance")
 }
