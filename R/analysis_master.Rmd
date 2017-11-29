@@ -54,7 +54,8 @@ univar_plot <- function(peak_trough, dep_var, data = efficacy_summary) {
   facet_wrap(~independent_var, scales = "free_x")
 
 scatter_plot
-  }
+}
+
 ```
 
 ##The user specifies wether the dependent variable they are interested in is ELU or ESP. They also specify the level (Cmax or Trough). The scatterplot defines the independent variable on the x axis, and dependent variable (ELU or ESP, depending on what is specified in the function), and colors it by dose (which is tied to the dose interval)
