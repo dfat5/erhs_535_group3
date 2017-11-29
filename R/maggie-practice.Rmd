@@ -92,7 +92,7 @@ coeff <- coef(fit,s=0.1)
 coeff <- as.data.frame(as.matrix(coeff))
 coeff 
 }
-
+ 
 LASSO_model("ELU", 100)
 ```
 

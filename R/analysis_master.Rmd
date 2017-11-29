@@ -18,6 +18,7 @@ library(ggthemes)
 library(rattle)
 library(rpart.plot)
 library(RColorBrewer)
+library(glmnet)
 source("practice_data.R")
 ```
 
