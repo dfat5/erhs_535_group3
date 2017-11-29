@@ -153,7 +153,10 @@ Interpretation:
 This function outputs raw coefficents and an intercept on an penalized maximum likelihood model. Models dropped from the model are represented with zeros. IT computes a LASSO penalty for small coeff and drops them, resulting in only the coef with the most leverage remaining.  
 
 
+
 ## RandomForest Function (Drew)
+
+The user specifies which dependent variable they would like to use (either ELU or ESP). The user can also specify a dataset they would like to use, if one is not provided then a default dataset is utilized. The function var_importance takes the input and outputs a graph displaying the which variables are the best predictors of the input (either ELU or ESP). 
 ```{r randomForest function}
 
 
@@ -207,6 +210,9 @@ graph %>%
        x = "Importance")
 }
 ```
+
+## Interpretation
+This function utilizes the function randomForest to predict which variables are the most important predictors of the associated outcome. This model works by randomly creating small data nodes that are split using the best predictor from a subset of predictors randomly chosen at each node. In order to determine variable importance, the algorithm looks at how much the predictive error increases as all variables remain unchanged while one is permuted. The resulting output shows the % increase in the mean standard error for each variable considered individually. The higher the number the more important the variable for model building. 
 
 ```{r testing function}
 best_variables("ELU")
