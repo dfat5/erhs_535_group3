@@ -33,6 +33,7 @@ library(broom)
 library(devtools)
 library(ggfortify)
 library(glmnet)
+library(knitr)
 ```
 
 ```{r}
@@ -101,7 +102,8 @@ colnames(coeff) <- c("predictor", "coeff")
 
 coeff <- coeff %>% 
   filter(coeff > 0) 
-coeff
+coeff %>% 
+  kable()
 }
  
 LASSO_model("ELU", 100)
