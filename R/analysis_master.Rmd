@@ -10,8 +10,6 @@ output:
 ```{r, include=FALSE}
 library(readxl)
 library(tidyverse)
-library(ggrepel)
-library(gghighlight)
 library(ggplot2)
 library(rpart)
 library(randomForest)
@@ -136,7 +134,7 @@ regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summ
 #dep_var options: "ELU" (lung efficacy) or "ESP" (spleen efficacy)
 #min_split: numeric input indicating minimum # observations for a split to be attempted
 #min_bucket: numeric input indicating minimum # observations in a terminal node
-regression_tree(dep_var = "ELU", min_split = 6, min_bucket = 4)
+regression_tree(dep_var = "ELU", min_split = 8, min_bucket = 4)
 ```
 Interpretation:  
 
