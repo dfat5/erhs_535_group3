@@ -2,7 +2,9 @@
 title: "Analysis Master"
 author: "Kate, Maggie, Drew, Ethan"
 date: "November 27, 2017"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r, include=FALSE}
@@ -23,7 +25,7 @@ source("practice_data.R")
 
 ```
 
-#Association between dependent and independent variables:
+#Association between dependent and independent variables:  
 Create summaries and visualizations of how the dependent variable is
 associated with different independent variables. Here, we will try to
 discover if there are characteristics of the drugs that are associated
@@ -76,9 +78,9 @@ regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summ
 #min_bucket: numeric input indicating minimum # observations in a terminal node
 regression_tree(dep_var = "ELU", min_split = 6, min_bucket = 4)
 ```
-Interpretation:
+Interpretation:  
 
-The number at the top of each node is indicating the mean of the outcome variable for the observations in that node (mean of 1.5 for node 1). Below each node is indicating what each split was based on. Splits are chosen based on a complexity parameter. Starting from node 1, the first split is made so that it leads to the greatest possible reduction in RSS. Node 3 is a terminal node because it only has 4 observations, which was the minimum number of observations a node can have to be considered (set in our function parameters). Given the 16 observations in node 2, another split is made that again gives the greatest possible reduction in RSS. This process continues until either the min_split or the min_bucket parameters are fulfilled for each node from the preset function parameters. 
+The number at the top of each node is indicating the mean of the outcome variable for the observations in that node (mean of 1.5 for node 1). Below each node is indicating what each split was based on. Splits are chosen based on a complexity parameter. Starting from node 1, the first split is made so that it leads to the greatest possible reduction in RSS. Node 3 is a terminal node because it only has 4 observations, which was the minimum number of observations a node can have to be considered (set in our function parameters). Given the 16 observations in node 2, another split is made that again gives the greatest possible reduction in RSS. This process continues until either the min_split or the min_bucket parameters are fulfilled for each node from the preset function parameters.  
 
 
 
@@ -115,9 +117,9 @@ coeff
 
 LASSO_model("ELU", 100)
 ```
-Interpretation:
+Interpretation:  
 
-This function outputs raw coefficents and an intercept on an penalized maximum likelihood model. Models dropped from the model are represented with zeros. IT computes a LASSO penalty for small coeff and drops them, resulting in only the coef with the most leverage remaining. 
+This function outputs raw coefficents and an intercept on an penalized maximum likelihood model. Models dropped from the model are represented with zeros. IT computes a LASSO penalty for small coeff and drops them, resulting in only the coef with the most leverage remaining.  
 
 
 
