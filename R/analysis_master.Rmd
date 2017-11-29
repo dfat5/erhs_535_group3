@@ -162,8 +162,13 @@ x <- as.matrix(predictors)
 fit = glmnet(x, y)
 
 coeff <- coef(fit,s=0.1)
-coeff <- as.data.frame(as.matrix(coeff))
-coeff 
+coeff <- as.data.frame(as.matrix(coeff)) %>% 
+rownames_to_column() 
+colnames(coeff) <- c("predictor", "coeff")
+
+coeff <- coeff %>% 
+  filter(coeff > 0) 
+coeff
 }
 ```
 
