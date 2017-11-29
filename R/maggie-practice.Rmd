@@ -96,5 +96,29 @@ coeff
 LASSO_model("ELU", 100)
 ```
 
+```{r doesnt_work}
+LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
+  data <- na.omit(df) %>% 
+  select_if(is.numeric) %>%
+  filter(dosage == dose)
+
+response <- df %>% 
+  select(dep_var)
+
+predictors <- df %>%
+  select(-dep_var)
+
+y <- as.numeric(unlist(response))
+x <- as.matrix(predictors)
+
+fit = glmnet(x, y)
+
+coeff <- coef(fit,s=0.1)
+coeff <- as.data.frame(as.matrix(coeff))
+coeff 
+}
+ 
+```
+
 
 
