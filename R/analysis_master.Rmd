@@ -20,8 +20,7 @@ source("practice_data.R")
 
 ```
 
-#Association between dependent and indeShow in New WindowClear OutputExpand/Collapse Output
-pendent variables:  
+#Association between dependent and independent variables:  
 Create summaries and visualizations of how the dependent variable is
 associated with different independent variables. Here, we will try to
 discover if there are characteristics of the drugs that are associated
@@ -30,7 +29,7 @@ ways (and code) to analyze that in the data. This might include
 generalized linear models, scatterplots, and possibly other supervised
 learning methods.  
 
-###Visualize univariate variables by dose in a scatterplot function
+###Visualize univariate variables in a scatterplot function, by drug dose (Kate)
 ```{r}
 univar_plot <- function(peak_trough, dep_var, data = efficacy_summary) {
  
