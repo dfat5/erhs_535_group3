@@ -20,8 +20,7 @@ source("practice_data.R")
 
 ```
 
-#Association between dependent and indeShow in New WindowClear OutputExpand/Collapse Output
-pendent variables:  
+#Association between dependent and independent variables:  
 Create summaries and visualizations of how the dependent variable is
 associated with different independent variables. Here, we will try to
 discover if there are characteristics of the drugs that are associated
@@ -30,7 +29,7 @@ ways (and code) to analyze that in the data. This might include
 generalized linear models, scatterplots, and possibly other supervised
 learning methods.  
 
-###Visualize univariate variables by dose in a scatterplot function
+###Visualize univariate variables in a scatterplot function, by drug dose (Kate)
 ```{r}
 univar_plot <- function(peak_trough, dep_var, data = efficacy_summary) {
  
@@ -50,10 +49,13 @@ univar_plot <- function(peak_trough, dep_var, data = efficacy_summary) {
   facet_wrap(~independent_var, scales = "free_x")
 
 scatter_plot
-  }
+}
+
+test <- univar_plot(peak_trough = "Cmax", dep_var = "ELU")
+
 ```
 
-##The user specifies wether the dependent variable they are interested in is ELU or ESP. They also specify the level (Cmax or Trough). The scatterplot defines the independent variable on the x axis, and dependent variable (ELU or ESP, depending on what is specified in the function), and colors it by dose (which is tied to the dose interval)
+##The user specifies wether the dependent variable they are interested in is ELU or ESP. They also specify the level (Cmax or Trough). The scatterplot defines the independent variable on the x axis, and dependent variable (ELU or ESP). The faceted plot is colored by dose (which is also tied to the dose interval)
 
 
 ##Fitting Linear Models Function (Kate)
@@ -67,27 +69,36 @@ function_data <- data %>%
   gather(key = independent_var, value = indep_measure, -drug, -dosage, -dose_int, -level, -ELU, -ESP, na.rm = TRUE) %>% 
   select(drug, dosage, dose_int, level, dep_var, indep_measure, independent_var) 
   
-  if(dep_var=="ELU") {vect <- function_data$ELU}
-  if(dep_var=="ESP") {vect <- function_data$ESP}
-  
+  if(dep_var=="ELU") {function_data$vect <- function_data$ELU}
+  if(dep_var=="ESP") {function_data$vect <- function_data$ESP}
+
   model_function <- function(data) {
-    model_results <- lm(vect ~ scale(indep_measure), data = function_data)
+    model_results <- lm(vect ~ scale(indep_measure), data = data)
   }
   
 estimate_results <- function_data %>% 
   group_by(independent_var, dose_int) %>% 
   nest() %>% 
-  mutate(mod_results = purrr::map(function_data, model_function)) %>% 
+  mutate(mod_results = purrr::map(data, model_function)) %>% 
   mutate(mod_coefs = purrr::map(mod_results, broom::tidy)) %>% 
   select(independent_var, dose_int, mod_results, mod_coefs) %>% 
   unnest(mod_coefs) %>% 
   filter(term == "scale(indep_measure)")
-  
-estimate_results
 
+coef_plot <- estimate_results %>%
+  mutate(independent_var = forcats::fct_reorder(independent_var, estimate, fun = max)) %>%
+  rename(Dose_Interval = dose_int) %>% 
+  ggplot(aes(x = estimate, y = independent_var, color = Dose_Interval)) +
+  geom_point(aes(size = 1 / std.error)) +
+  scale_size_continuous(guide = FALSE) +
+  theme_few() + 
+  ggtitle(label = "Linear model coefficients as function of independent variables, \n by drug dose and model uncertainty", subtitle = "smaller points have more uncertainty than larger points") +
+  geom_vline(xintercept = 0, color = "cornflower blue") 
+
+coef_plot
 }
 
-test_2 <- linear_model(peak_trough = "Cmax", dep_var = "ELU", data = efficacy_summary)
+test_2 <- linear_model(peak_trough = "Cmax", dep_var = "ELU")
 ```
 
 
