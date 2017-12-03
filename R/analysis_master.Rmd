@@ -126,7 +126,7 @@ regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summ
   
   par(mfrow = c(1,1.5), xpd = NA) # otherwise on some devices the text is clipped
   plot(tree, uniform=TRUE, 
-  	main="Classification Tree")
+  	main="Regression Tree")
   text(tree, use.n=TRUE, all=TRUE, cex=.8)
 }
 ```
