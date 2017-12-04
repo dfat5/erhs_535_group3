@@ -104,7 +104,8 @@ test_2 <- linear_model(peak_trough = "Cmax", dep_var = "ELU")
 
 ##Regression Tree Function (Ethan):
 ```{r}
-regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summary) {
+regression_tree <- function(dep_var = "ELU", min_split = 8, min_bucket = 6, 
+                            data = efficacy_summary) {
   
   if (dep_var == "ELU") {
     
@@ -150,7 +151,7 @@ regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summ
                                        minbucket = min_bucket))
   }
   
-  par(mfrow = c(1,1.5), xpd = NA) # otherwise on some devices the text is clipped
+  par(mfrow = c(1, 1), xpd = NA, mar = c(5,5,5,5))
   plot(tree, uniform=TRUE)
   text(tree, use.n=TRUE, all=TRUE, cex=.8, minlength = 0, fancy = TRUE, 
      bg = "lightblue", fwidth = .8, fheight = .8)
