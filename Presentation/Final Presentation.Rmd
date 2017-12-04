@@ -207,13 +207,13 @@ coeff %>%
 ## Testing LASSO function:
 
 ```{r}
-LASSO_model(dep_var = "ELU", dose = 100)
+#LASSO_model(dep_var = "ELU", dose = 100)
 ```
 
 
 ## Interpretation: 
 
-- This function outputs raw coefficents and an intercept on an penalized maximum likelihood model. Models dropped from the model are represented with zeros. IT computes a LASSO penalty for small coeff and drops them, resulting in only the coef with the most leverage remaining.  
+- This function outputs raw coefficents and an intercept on an penalized maximum likelihood model. Models dropped from the model are represented with zeros. It computes a LASSO penalty for small coefficents and drops them, resulting in only the coef with the most leverage remaining.  
 
 
 
