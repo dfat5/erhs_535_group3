@@ -193,18 +193,19 @@ x <- as.matrix(predictors)
 fit = glmnet(x, y)
 
 coeff <- coef(fit,s=0.1)
-coeff <- as.data.frame(as.matrix(coeff)) %>% 
-rownames_to_column() 
-colnames(coeff) <- c("predictor", "coeff")
+coeff <- as.data.frame(as.matrix(coeff))
 
 coeff <- coeff %>% 
+  rownames_to_column() %>% 
   filter(coeff > 0) 
+  colnames(coeff) <- c("predictor", "coeff")
 coeff %>% 
   kable()
 }
 ```
 
 ## Testing LASSO function:
+
 ```{r}
 LASSO_model(dep_var = "ELU", dose = 100)
 ```

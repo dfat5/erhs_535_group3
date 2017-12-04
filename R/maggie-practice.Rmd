@@ -119,7 +119,7 @@ response <- df %>%
   select(dep_var)
 
 predictors <- df %>%
-  select(-dep_var)
+  select(c("PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "cLogP", "huPPB", "muPPB", "MIC_Erdman", 'MICserumErd', "MIC_Rv", "Caseum_binding", "MacUptake"))
 
 y <- as.numeric(unlist(response))
 x <- as.matrix(predictors)
@@ -128,7 +128,11 @@ fit = glmnet(x, y)
 
 coeff <- coef(fit,s=0.1)
 coeff <- as.data.frame(as.matrix(coeff))
-coeff 
+
+coeff <- coeff %>% 
+  filter(coeff > 0) 
+coeff %>% 
+  kable()
 }
  
 ```
