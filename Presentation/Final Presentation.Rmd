@@ -167,6 +167,14 @@ regression_tree(dep_var = "ELU", min_split = 8, min_bucket = 6)
 
 
 ## LASSO Function
+The function for LASSO required the following inputs:
+
+- Dependant varaible 
+- Dose
+- Dataframe, though the dataframe default is efficacy_summary
+
+The output in the end is coefficients with smaller coefficients being resitricted to zero.
+
 ```{r}
 LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
   data <- na.omit(df) %>% 
@@ -198,13 +206,9 @@ coeff %>%
 
 ## Testing LASSO function:
 ```{r}
-#LASSO_model(dep_var, dose, df)
-#dep_var options: "ELU" (lung efficacy) or "ESP" (spleen efficacy)
-#dose = dosage 
-#df = dataframe, default is efficacy_summary
-
-#LASSO_model("ELU", 100)
+LASSO_model(dep_var = "ELU", dose = 100)
 ```
+
 
 ## Interpretation: 
 
