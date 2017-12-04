@@ -1,0 +1,12 @@
+---
+title: "Final Report"
+author: "Group 3"
+date: "December 4, 2017"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+The report should be no longer than 5 pages (using default font size, line spacing, etc. for RMarkdown documents; if you include figures or tables that show output from your functions, these do not need to count towards that page limit). Be sure to show examples of using your functions in your Word report.
