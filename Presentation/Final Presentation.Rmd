@@ -354,7 +354,7 @@ graph %>%
 
 ```{r testing function}
 best_variables("ELU")
-best_variables("ESP")
+
 ```
 
 ## Interpretation
