@@ -12,6 +12,7 @@ library(readxl)
 library(tidyverse)
 library(ggplot2)
 library(rpart)
+library(rpart.plot)
 library(randomForest)
 library(ggthemes)
 library(glmnet)
@@ -150,11 +151,11 @@ regression_tree <- function(dep_var = "ELU", min_split = 8, min_bucket = 6,
                control = rpart.control(cp = -1, minsplit = min_split, 
                                        minbucket = min_bucket))
   }
-  
-  par(mfrow = c(1, 1), xpd = NA, mar = c(5,5,5,5))
-  plot(tree, uniform=TRUE)
-  text(tree, use.n=TRUE, all=TRUE, cex=.8, minlength = 0, fancy = TRUE, 
-     bg = "lightblue", fwidth = .8, fheight = .8)
+  return(rpart.plot(tree))
+  #par(mfrow = c(1, 1), xpd = NA, mar = c(5,5,5,5))
+  #plot(tree, uniform=TRUE)
+  #text(tree, use.n=TRUE, all=TRUE, cex=.8, minlength = 0, fancy = TRUE, 
+   #  bg = "lightblue", fwidth = .8, fheight = .8)
 }
 ```
 
