@@ -208,6 +208,7 @@ The number at the top of each node is indicating the mean of the outcome variabl
 ##LASSO Function (Maggie):
 ```{r}
 LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
+  if(dep_var != c("ELU", "ESP")) stop('Hey! You can only use ELU or ESP for dep_var!') 
   dataz <- na.omit(df) %>% 
   select_if(is.numeric) %>%
   filter(dosage == dose)
