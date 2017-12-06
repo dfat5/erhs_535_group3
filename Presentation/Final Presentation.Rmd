@@ -1,14 +1,14 @@
 ---
 title: "Final Presentation"
 author: "Group 3"
-date: "November 27, 2017"
+date: "December 4, 2017"
 output:
   beamer_presentation: default
   slidy_presentation: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r, include=FALSE}
@@ -27,8 +27,50 @@ source("../R/practice_data.R")
 
 - Create summaries and visualizations of how the dependent variable is associated with different independent variables. Here, we will try to discover if there are characteristics of the drugs that are associated with effectiveness against TB. This group will need to come up with ways (and code) to analyze that in the data. This might include generalized linear models, scatterplots, and possibly other supervised learning methods. 
 
+
+## Rationale: 
+
+- Explain what you were hoping to achieve in writing the functions / app framework that your group created.
+
+
+## Idea development: 
+
+- Describe the different ideas your group explored. What were the biggest challenges in this stage? For any ideas that didn’t pan out, what were the key constraints? Also describe how you would tackle this problem if you were starting over.
+
+
+## Key functions: 
+
+- Describe the final functions / app framework you decided on. Explain why you picked these. For functions, include documentation for the functions:
+- Write a brief title for the function (< 8 words) and a brief description
+(3–4 sentences).
+- Define all parameters. For example, if you have a df parameter,
+explain that this is the dataframe that will be modeled / visualized. If
+it must have certain column with certain names, specify that.
+- Define what the functions will output (e.g., “A ggplot object showing
+. . . ” or “The model output object from running a . . . ”).
+- If you have a reference (e.g., for a model you’re fitting in the
+function), you can include that
+- If you want an extra challenge, try to use the Roxygen2 syntax in
+writing these descriptions. Otherwise, you can write them in code
+comments.
+
+
+## Room for errors: 
+
+- So far, we have focused on getting working prototypes, without making sure they’re error-proof and robust to a user doing something non-standard. Identify three things a user could do that could make your functions “break” (i.e., either return an error message or return something other than what you hope they will).
+
+
+## Next steps: 
+
+- Include a section where you describe what you think are interesting next steps, i.e., what you would pursue next if you were continuing work on this project. Lay out explicitly a few ideas (2–3) that you think would be helpful. Be sure, when relevant, to describe how feedback from the project researchers helped in forming these ideas for next steps.
+
+
+## Functions:
+
+
 ## Visualize univariate variables in a scatterplot function, by drug dose
-To visualize univariate variables correlations with the outcome variables, a faceted scatterplot colored by dose was created. Inputs to this function include `peak_trough`, which evaluates the peak or trough (Cmax or Trough) respectively, of drug following injection. The dep_var options are either ELU or ESP (lung levels and spleen levels, respectively. 
+
+- To visualize univariate variables correlations with the outcome variables, a faceted scatterplot colored by dose was created. Inputs to this function include `peak_trough`, which evaluates the peak or trough (Cmax or Trough) respectively, of drug following injection. The dep_var options are either ELU or ESP (lung levels and spleen levels, respectively. 
 
 ```{r fig.height=4, fig.width=8, warnings = FALSE}
 univar_plot <- function(peak_trough, dep_var, data = efficacy_summary) {
@@ -62,13 +104,15 @@ test
 
 
 ## Interpretation
+
 - It appears that the relationship between independent and dependent variables are dependent on dose for variables cLogP, huPPB, PLA, and SLE. The others are not dependent on dose. 
 - Dose may be an important factor to consider when evaluating the relationship between independent and dependent variables. 
 
 
 
 ## Fitting Linear Models Function (Example inputs Peak_trough = Cmax, Dep_var = ELU)
-I fitted a linear model regressing dependent on independent variables to assess the relationships between them. Inputs to this function include peak_trough (options are Cmax or trough), or the dep_var (options are ELU or ESP). The units of scale for each variable were normalized so that we could compare across coeficients. 
+
+- I fitted a linear model regressing dependent on independent variables to assess the relationships between them. Inputs to this function include peak_trough (options are Cmax or trough), or the dep_var (options are ELU or ESP). The units of scale for each variable were normalized so that we could compare across coeficients. 
 
 ```{r fig.height= 4, fig.width=8}
 #Define the linear model function
@@ -125,7 +169,8 @@ test_2
 
 ## Regression Tree Function
 ```{r}
-regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summary) {
+regression_tree <- function(dep_var = "ELU", min_split = 8, min_bucket = 6, 
+                            data = efficacy_summary) {
   
   if (dep_var == "ELU") {
     
@@ -171,7 +216,7 @@ regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summ
                                        minbucket = min_bucket))
   }
   
-  par(mfrow = c(1,1.5), xpd = NA) # otherwise on some devices the text is clipped
+  par(mfrow = c(1, 1), xpd = NA, mar = c(5,5,5,5))
   plot(tree, uniform=TRUE)
   text(tree, use.n=TRUE, all=TRUE, cex=.8, minlength = 0, fancy = TRUE, 
      bg = "lightblue", fwidth = .8, fheight = .8)
@@ -179,7 +224,7 @@ regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summ
 ```
 
 ## Testing regression_tree function
-```{r}
+```{r, fig.width=8, fig.height=5}
 #dep_var options: "ELU" (lung efficacy) or "ESP" (spleen efficacy)
 #min_split: numeric input indicating minimum # observations for a split to be attempted
 #min_bucket: numeric input indicating minimum # observations in a terminal node
@@ -187,10 +232,12 @@ regression_tree(dep_var = "ELU", min_split = 8, min_bucket = 6)
 ```
 
 ## Interpretation
+
 - The number at the top of each node is indicating the mean of the outcome variable for the observations in that node (mean of 1.5 for node 1). Below each node is indicating what each split was based on. Splits are chosen based on a complexity parameter. Starting from node 1, the first split is made so that it leads to the greatest possible reduction in RSS. Node 3 is a terminal node because it only has 4 observations, which was the minimum number of observations a node can have to be considered (set in our function parameters). Given the 16 observations in node 2, another split is made that again gives the greatest possible reduction in RSS. This process continues until either the min_split or the min_bucket parameters are fulfilled for each node from the preset function parameters.  
 
 
 ## LASSO Function
+
 The function for LASSO required the following inputs:
 
 - Dependant varaible 
@@ -307,7 +354,7 @@ graph %>%
 
 ```{r testing function}
 best_variables("ELU")
-best_variables("ESP")
+
 ```
 
 ## Interpretation

@@ -1,0 +1,55 @@
+---
+title: "Final Report"
+author: "Group 3"
+date: "December 4, 2017"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+The report should be no longer than 5 pages (using default font size, line spacing, etc. for RMarkdown documents; if you include figures or tables that show output from your functions, these do not need to count towards that page limit). Be sure to show examples of using your functions in your Word report.
+
+# Introduction/Background/Objective
+## Group 3 Objective: Association between dependent and independent variables
+
+- Create summaries and visualizations of how the dependent variable is associated with different independent variables. Here, we will try to discover if there are characteristics of the drugs that are associated with effectiveness against TB. This group will need to come up with ways (and code) to analyze that in the data. This might include generalized linear models, scatterplots, and possibly other supervised learning methods. 
+
+
+# Rationale: 
+
+- Explain what you were hoping to achieve in writing the functions / app framework that your group created.
+
+
+# Idea development: 
+
+- Describe the different ideas your group explored. What were the biggest challenges in this stage? For any ideas that didn’t pan out, what were the key constraints? Also describe how you would tackle this problem if you were starting over.
+
+
+# Key functions: 
+
+- Describe the final functions / app framework you decided on. Explain why you picked these. For functions, include documentation for the functions:
+- Write a brief title for the function (< 8 words) and a brief description
+(3–4 sentences).
+- Define all parameters. For example, if you have a df parameter,
+explain that this is the dataframe that will be modeled / visualized. If
+it must have certain column with certain names, specify that.
+- Define what the functions will output (e.g., “A ggplot object showing
+. . . ” or “The model output object from running a . . . ”).
+- If you have a reference (e.g., for a model you’re fitting in the
+function), you can include that
+- If you want an extra challenge, try to use the Roxygen2 syntax in
+writing these descriptions. Otherwise, you can write them in code
+comments.
+
+
+# Room for errors: 
+
+- So far, we have focused on getting working prototypes, without making sure they’re error-proof and robust to a user doing something non-standard. Identify three things a user could do that could make your functions “break” (i.e., either return an error message or return something other than what you hope they will).
+
+
+# Next steps: 
+
+- Include a section where you describe what you think are interesting next steps, i.e., what you would pursue next if you were continuing work on this project. Lay out explicitly a few ideas (2–3) that you think would be helpful. Be sure, when relevant, to describe how feedback from the project researchers helped in forming these ideas for next steps.
+

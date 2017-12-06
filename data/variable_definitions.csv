@@ -1,0 +1,20 @@
+Vitro_or_Vivo,Name,Label,Definition
+vivo,PLA,Plasma,amount of drug found in plasma
+vivo,ULU,Uninvolved Lung,amount of drug found in uninvolved lung (part of the lung where there is no lesion). 
+vivo,RIM,Rim (of Lesion),amount of drug found in Rim (of lesion) 
+vivo,OCS,Outer Caseum ,amount of drug found in outer caseum
+vivo,ICS,Inner Caseum,amount of drug found in inner caseum
+vivo,SLU,Standard Lung,amount of drug found in standard lung EXCLUDING THE LESION
+vivo,SLE,Standard Lesion,"amount of drug found in standard lesion (JUST THE LESION, NO LUNG)"
+vitro,cLogP,cLogP,octanol:water partition coefficient. This is the logarithm of the concentration of drug in octanol (oil) and water - it's a measure of lipohilicity/hydrophoicity of the drug.
+vitro,huPPB,Human Plasma Binding,"The fraction of drug concentration that binds to human plasma proteins, (1 - huPPB) is then the free concentration of the drug. "
+vitro,muPPB,Mouse Plasma Binding,"the fraction of drug concentration that binds to mouse plasma proteins, (1 - muPPB) is then the free concentration of the drug. "
+vitro,MIC_Erdman,MIC Erdman Strain,"Minimum Inhibitory Concentration of Erdman strain. This is the minimum drug concentration that inhibits the growth of the bacteria, in this case the Erdman strain of Mycobacterium tuberculosis. "
+vitro,MICserumErd,MIC Erdman Strain with Serum,"Minimum Inhibitory Concentration of Erdman Strain WITH serum added (serum added demonstrates a more similar to the environment the drug acts in, in-vivo). "
+vitro,MIC_Rv,MIC Rv Strain,MIC for H37Rv strain of M. tuberculosis.
+vitro,Caseum_binding ,Caseum Binding ,fraction of drug concentration that is bound to the constituents of the caseum (caseum is at the center of the necrotic granuloma) (% unbound)
+vitro,MacUptake ,Macrophage Uptake (Ratio) ,rate of uptake of drug molecules by macrophages. (I/E concentration ratio). MacUptake is unitless (I / E concentration ratio)--this could refer to concentrations inside and outside the macrophage I intracellular / E extracellular. The time at which the measurement is taken is probably a standard one.
+drug,drug,Drug ,The drug being tested
+drug,dosage,Drug Dosage,The dosage of adminstered drug
+drug,dose_int,Dosage Interval,"When the dose is adminstered (QD reflects once per day, and BID reflects twice per day)"
+drug,level,Level of Drug,"The level the drug was measured.(Either occurs at the highest level (cmax), or lowest level (trough)"

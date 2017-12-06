@@ -18,6 +18,7 @@ library(glmnet)
 library(knitr)
 library(ggbeeswarm)
 library(gghighlight)
+library(tibble)
 source("practice_data.R")
 ```
 
@@ -137,7 +138,8 @@ test_3 <- drug_mouse(dep_var = "lung_efficacy")
 
 ##Regression Tree Function (Ethan):
 ```{r}
-regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summary) {
+regression_tree <- function(dep_var = "ELU", min_split = 8, min_bucket = 6, 
+                            data = efficacy_summary) {
   
   if (dep_var == "ELU") {
     
@@ -183,7 +185,7 @@ regression_tree <- function(dep_var, min_split, min_bucket, data = efficacy_summ
                                        minbucket = min_bucket))
   }
   
-  par(mfrow = c(1,1.5), xpd = NA) # otherwise on some devices the text is clipped
+  par(mfrow = c(1, 1), xpd = NA, mar = c(5,5,5,5))
   plot(tree, uniform=TRUE)
   text(tree, use.n=TRUE, all=TRUE, cex=.8, minlength = 0, fancy = TRUE, 
      bg = "lightblue", fwidth = .8, fheight = .8)
@@ -206,14 +208,14 @@ The number at the top of each node is indicating the mean of the outcome variabl
 ##LASSO Function (Maggie):
 ```{r}
 LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
-  data <- na.omit(df) %>% 
+  dataz <- na.omit(df) %>% 
   select_if(is.numeric) %>%
   filter(dosage == dose)
 
-response <- df %>% 
+response <- dataz %>% 
   select(dep_var)
 
-predictors <- df %>%
+predictors <- dataz %>%
   select(c("PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "cLogP", "huPPB", "muPPB", "MIC_Erdman", 'MICserumErd', "MIC_Rv", "Caseum_binding", "MacUptake"))
 
 y <- as.numeric(unlist(response))
@@ -242,6 +244,8 @@ coeff %>%
 
 LASSO_model("ELU", 100)
 ```
+
+
 Interpretation:  
 
 This function outputs raw coefficents and an intercept on an penalized maximum likelihood model. Models dropped from the model are represented with zeros. IT computes a LASSO penalty for small coeff and drops them, resulting in only the coef with the most leverage remaining.  
@@ -253,11 +257,16 @@ This function outputs raw coefficents and an intercept on an penalized maximum l
 The user specifies which dependent variable they would like to use (either ELU or ESP). The user can also specify a dataset they would like to use, if one is not provided then a default dataset is utilized. The function var_importance takes the input and outputs a graph displaying the which variables are the best predictors of the input (either ELU or ESP). 
 ```{r randomForest function}
 
-
-best_variables <- function(dep_var, df = efficacy_summary){
+best_variables <- function(dep_var = "ELU", drug = FALSE, df = efficacy_summary){
   
   
   title <- paste0 ("Predicing Variable Importance Using ", as.character(dep_var))
+  
+  if (drug == FALSE){
+    df <- df %>% 
+    select(-drug)
+  } 
+  
   
   if(dep_var == "ELU"){
   dataset <- df %>% 
@@ -271,7 +280,7 @@ best_variables <- function(dep_var, df = efficacy_summary){
 
 efficacy.rf <- randomForest( ELU~ ., data =dataset,
               na.action = na.roughfix,
-                        ntree= 1000, 
+                        ntree= 500, 
                         importance = TRUE)
   }
   
@@ -287,7 +296,7 @@ efficacy.rf <- randomForest( ELU~ ., data =dataset,
 
 efficacy.rf <- randomForest( ESP ~ ., data =dataset,
               na.action = na.roughfix,
-                        ntree= 1000, 
+                        ntree= 500, 
                         importance = TRUE)
   }
   
@@ -295,18 +304,27 @@ graph <-importance(efficacy.rf, type = 1) %>%
   as.data.frame() %>% 
   rownames_to_column() %>% 
   rename(variable = rowname, 
-         mse = `%IncMSE`) 
+         mse = `%IncMSE`) %>% 
+  left_join(variable_definitions, 
+            by = c("variable" = "Name"))
 
-
-
-graph %>% 
+test <- graph %>% 
   filter(mse > 0) %>% 
   ggplot()+
-  geom_point(aes(x = mse, y = reorder(variable, mse)))+
+  geom_point(aes(x = mse, 
+                 y = reorder(Label, mse), 
+                 color = Vitro_or_Vivo, 
+                 text = paste('Variable: ', Label, '\n',
+                              'Definition: ', Definition
+                              )))+
   theme_minimal()+
   ggtitle(title)+
   labs(y = "Variable", 
-       x = "Importance")
+       x = "Importance", 
+       color = "In Vivo, In Vitro, or Drug" )
+
+
+ggplotly(test, tooltip = c("text"))
 }
 ```
 

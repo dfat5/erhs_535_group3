@@ -11,6 +11,7 @@ library(tidyverse)
 library(readxl)
 library(randomForest)
 library(ggthemes)
+library(stringr)
 source("practice_data.R")
 
 ```
@@ -31,37 +32,16 @@ efficacy_sumrf <- efficacy_summary %>%
          level = as.factor(level), 
          drug = as.factor(drug))
 
+  #rename("Caseum Binding" = Caseum_binding)
+
 str(efficacy_sumrf)
 
-#nunmber of predictors (mtry = 20/3 = 6.3, try mtry with 3 and mtry with 12 )
 efficacy.rf <- randomForest( ELU~ ., data = efficacy_sumrf,
               na.action = na.roughfix,
                         ntree= 1000, 
                         importance = TRUE)
 
-efficacy.rf2 <- randomForest( ELU~ ., data = efficacy_sumrf,
-              na.action = na.roughfix,
-              mtry = 3,
-                        ntree= 500, 
-                        importance = TRUE)
 
-efficacy.rf3 <- randomForest( ELU~ ., data = efficacy_sumrf,
-              na.action = na.roughfix,
-              mtry = 3,
-                        ntree= 500, 
-                        importance = TRUE)
-
-print(efficacy.rf)
-print(efficacy.rf2)
-print(efficacy.rf3)
-
-#looking at data leave mtry as default because it has the best %var explained 
-
-varImpPlot(efficacy.rf)
-varImpPlot(efficacy.rf2)
-varImpPlot(efficacy.rf3)
-
-?randomForest
 
 ```
  notes: use %incMSE and export to ggplot to make a prettier graph! also in your report specify what is being specified and what is not being speciefied ie mtry etc. 
@@ -72,14 +52,43 @@ also maybe do doseage so you can check dosage
  
  
  
-```{r playing with Random forest tutorial}
+```{r playing with Random forest graph}
 print(efficacy.rf)
+
+head(variable_definitions)
+
+trash <- 
+
+variable_definitions$Name <- str_replace(variable_definitions$Name, " ", "_" )
+
+efficacy_sumrf <- efficacy_summary %>% 
+  select(-ESP) %>% 
+  mutate(huPPB = as.numeric(huPPB), 
+         muPPB = as.numeric(muPPB), 
+         dosage = as.factor(dosage), 
+         dose_int = as.factor(dose_int), 
+         level = as.factor(level), 
+         drug = as.factor(drug)) 
+
+?left_join
+?str_replace
+variable
+
+importance(efficacy.rf, type = 1)
+
+
 
 graph <-importance(efficacy.rf, type = 1) %>% 
   as.data.frame() %>% 
   rownames_to_column() %>% 
   rename(variable = rowname, 
-         mse = `%IncMSE`) 
+         mse = `%IncMSE`) %>% 
+  left_join(variable_definitions, 
+            by = c("variable" = "Name"))
+
+?left_join
+
+title <- paste0 (c("Predicing Variable Importance Using"))
 
 
 graph %>% 
@@ -87,9 +96,10 @@ graph %>%
   ggplot()+
   geom_point(aes(x = mse, y = reorder(variable, mse)))+
   theme_minimal()+
+  ggtitle(title)+
   labs(y = "Variable", 
        x = "Importance")
-
+?ggtitle
 ?select
 ?data_frame
 
@@ -103,8 +113,10 @@ vignette("randomForest")
 
 
 ```{r writting function}
-
-best_variables <- function(dep_var, df = efficacy_summary){
+best_variables <- function(dep_var = "ELU", df = efficacy_summary){
+  
+  
+  title <- paste0 ("Predicing Variable Importance Using ", as.character(dep_var))
   
   if(dep_var == "ELU"){
   dataset <- df %>% 
@@ -144,22 +156,18 @@ graph <-importance(efficacy.rf, type = 1) %>%
   rename(variable = rowname, 
          mse = `%IncMSE`) 
 
-
 graph %>% 
   filter(mse > 0) %>% 
   ggplot()+
   geom_point(aes(x = mse, y = reorder(variable, mse)))+
   theme_minimal()+
+  ggtitle(title)+
   labs(y = "Variable", 
        x = "Importance")
-
-
-
-  
 }
 
 ```
-
+add drug exlude if include drug is false select it out 
 
 
 ```{r testing function}
@@ -171,6 +179,34 @@ best_variables("ESP")
 ```
 
 
+```{r trying out mtry}
+
+
+
+#nunmber of predictors (mtry = 20/3 = 6.3, try mtry with 3 and mtry with 12 )
+
+
+efficacy.rf2 <- randomForest( ELU~ ., data = efficacy_sumrf,
+              na.action = na.roughfix,
+                        importance = TRUE)
+
+efficacy.rf3 <- randomForest( ELU~ ., data = efficacy_sumrf,
+              na.action = na.roughfix,
+              mtry = 3,
+                        ntree= 500, 
+                        importance = TRUE)
+
+
+print(efficacy.rf2)
+print(efficacy.rf3)
+
+#looking at data leave mtry as default because it has the best %var explained 
+
+varImpPlot(efficacy.rf)
+varImpPlot(efficacy.rf2)
+varImpPlot(efficacy.rf3)
+
+```
 
 
 
