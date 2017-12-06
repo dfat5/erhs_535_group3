@@ -34,6 +34,7 @@ library(devtools)
 library(ggfortify)
 library(glmnet)
 library(knitr)
+library(tibble)
 ```
 
 ```{r}
@@ -44,11 +45,11 @@ source("practice_data.R")
 
 
 ```{r}
-full_model <- lm(ELU ~ PLA + ULU + RIM + OCS + ICS + SLU + SLE + MIC_Erdman + MICserumErd + MIC_Rv + cLogP + huPPB + muPPB + Caseum_binding + MacUptake, data = efficacy_summary)
+#full_model <- lm(ELU ~ PLA + ULU + RIM + OCS + ICS + SLU + SLE + MIC_Erdman + MICserumErd + MIC_Rv + cLogP + huPPB + muPPB + Caseum_binding + MacUptake, data = efficacy_summary)
 
-full_model <- lm(ELU ~ PLA + ULU + RIM, data = efficacy_summary)
+#full_model <- lm(ELU ~ PLA + ULU + RIM, data = efficacy_summary)
 
-model_foward <- step(full_model, direction = "forward", trace = 1)
+#model_foward <- step(full_model, direction = "forward", trace = 1)
 ```
 
 
@@ -80,14 +81,14 @@ coeff
 
 ```{r doesnt_work}
 LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
-  data <- na.omit(df) %>% 
+  dataz <- na.omit(df) %>% 
   select_if(is.numeric) %>%
   filter(dosage == dose)
 
-response <- df %>% 
+response <- dataz %>% 
   select(dep_var)
 
-predictors <- df %>%
+predictors <- dataz %>%
   select(c("PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "cLogP", "huPPB", "muPPB", "MIC_Erdman", 'MICserumErd', "MIC_Rv", "Caseum_binding", "MacUptake"))
 
 y <- as.numeric(unlist(response))

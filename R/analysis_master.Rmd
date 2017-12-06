@@ -16,6 +16,7 @@ library(randomForest)
 library(ggthemes)
 library(glmnet)
 library(knitr)
+library(tibble)
 source("practice_data.R")
 ```
 
@@ -174,14 +175,14 @@ The number at the top of each node is indicating the mean of the outcome variabl
 ##LASSO Function (Maggie):
 ```{r}
 LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
-  data <- na.omit(df) %>% 
+  dataz <- na.omit(df) %>% 
   select_if(is.numeric) %>%
   filter(dosage == dose)
 
-response <- df %>% 
+response <- dataz %>% 
   select(dep_var)
 
-predictors <- df %>%
+predictors <- dataz %>%
   select(c("PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "cLogP", "huPPB", "muPPB", "MIC_Erdman", 'MICserumErd', "MIC_Rv", "Caseum_binding", "MacUptake"))
 
 y <- as.numeric(unlist(response))
