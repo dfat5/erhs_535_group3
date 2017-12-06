@@ -16,6 +16,8 @@ library(randomForest)
 library(ggthemes)
 library(glmnet)
 library(knitr)
+library(ggbeeswarm)
+library(gghighlight)
 source("practice_data.R")
 ```
 
@@ -100,7 +102,38 @@ coef_plot
 test_2 <- linear_model(peak_trough = "Cmax", dep_var = "ELU")
 ```
 
+##Efficacy of drugs by individual mouse plot
 
+```{r}
+
+drug_mouse <- function(dep_var, data = clean_2_combined) {
+
+ind_mouse_data <- clean_2_combined %>% 
+  select(drug, mouse_id, dep_var) %>% 
+  mutate(drug = as.factor(drug), dep_var = as.numeric(dep_var)) %>% 
+  mutate(mouse_id = as.factor(mouse_id)) %>% 
+  mutate(upper_bound = quantile(dep_var, 0.75, na.rm = TRUE) + (1.5 * IQR(dep_var, na.rm = TRUE))) %>%  
+  mutate(lower_bound = quantile(dep_var, 0.25, na.rm = TRUE) - (1.5 * IQR(dep_var, na.rm = TRUE))) %>% 
+  mutate(outlier = dep_var > upper_bound | dep_var < lower_bound) %>% 
+  group_by(drug) 
+
+
+  if(dep_var=="lung_efficacy") {ind_mouse_data$vect <- ind_mouse_data$lung_efficacy}
+  if(dep_var=="spleen_efficacy") {ind_mouse_data$vect <- ind_mouse_data$spleen_efficacy}
+
+ind_mouse_plot <- ind_mouse_data %>%  
+  gghighlight_point(aes(x = drug, y = vect), outlier == TRUE, label_key = mouse_id, fill, unhighlighted_colour = alpha("blue")) +
+  geom_beeswarm() +
+  ylab("Colony Forming Units") +
+  ggtitle("Efficacy by individual mouse", subtitle = "Outliers labelled by mouse ID") +
+  theme_few()
+  
+ind_mouse_plot 
+
+}
+
+test_3 <- drug_mouse(dep_var = "lung_efficacy")
+```
 
 ##Regression Tree Function (Ethan):
 ```{r}
