@@ -35,6 +35,7 @@ library(ggfortify)
 library(glmnet)
 library(knitr)
 library(tibble)
+library(assertive)
 ```
 
 ```{r}
@@ -81,6 +82,7 @@ coeff
 
 ```{r doesnt_work}
 LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
+  if(dep_var != c("ELU", "ESP")) stop('Hey! You can only use ELU or ESP for dep_var!') 
   dataz <- na.omit(df) %>% 
   select_if(is.numeric) %>%
   filter(dosage == dose)
@@ -107,7 +109,7 @@ coeff %>%
   kable()
 }
  
-LASSO_model("ELU", 100)
+LASSO_model("", 100)
 ```
 
 ```{r doesnt_work}
@@ -136,6 +138,11 @@ coeff %>%
   kable()
 }
  
+```
+```{r}
+if(){
+  stop("STOP IT")
+}
 ```
 
 
