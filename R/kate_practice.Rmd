@@ -34,6 +34,7 @@ library(ggpmisc)
 library(broom)
 library(devtools)
 library(ggfortify)
+library(gghighlight)
 
 ```
 
@@ -113,25 +114,25 @@ this model fit each feature what a time
 ```{r}
 #individual mouse function
 library(ggbeeswarm)
-str(clean_2_combined)
-head(clean_2_combined)
 
 ind_mouse_data <- clean_2_combined %>% 
   select(drug, mouse_id, lung_efficacy) %>% 
   mutate(drug = as.factor(drug)) %>% 
   mutate(mouse_id = as.factor(mouse_id)) %>% 
+  mutate(upper_bound = quantile(lung_efficacy, 0.75, na.rm = TRUE) + (1.5 * IQR(lung_efficacy, na.rm = TRUE))) %>%  
+  mutate(lower_bound = quantile(lung_efficacy, 0.25, na.rm = TRUE) - (1.5 * IQR(lung_efficacy, na.rm = TRUE))) %>% 
+  mutate(outlier = lung_efficacy > upper_bound | lung_efficacy < lower_bound) %>% 
   group_by(drug) 
-  #Add mutate true or false logical statement if outside IQR
-  
-ind_mouse_plot <- ind_mouse_data %>%   
-  ggplot(aes(x = drug, y = lung_efficacy)) +
+
+ind_mouse_plot <- ind_mouse_data %>%  
+  gghighlight_point(aes(x = drug, y = lung_efficacy), outlier == TRUE, label_key = mouse_id, fill, unhighlighted_colour = alpha("blue"), colour = type) +
   geom_beeswarm() +
-  geom_smooth() +
   ylab("Colony Forming Units") +
+  ggtitle("Efficacy by individual mouse", subtitle = "Outliers labelled by mouse ID") +
   theme_few()
   
-ind_mouse_plot
-#Group by each drug and label for points outside IQR. then use Geomhighlight (and geomrepel (used in place of geomtext) to add on which mouse it was 
+ind_mouse_plot 
+
 ```
 
 This plot shows the efficacy of each drug on in bacterial burden in the lung ( measured in CFU). Each data point is one mouse. There is a lot of variability in the mouse model relative to their pathology and infection
