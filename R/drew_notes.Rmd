@@ -200,13 +200,13 @@ test <- graph %>%
                  color = Vitro_or_Vivo, 
                  text = paste('Mean Standard Error: ', round(mse, digits = 2), '\n',
                               'Variable: ', Label, '\n',
-                              'Definition: ', Definition
+                              'Definition: ', str_wrap(Definition, width = 40)
                               )))+
   theme_minimal()+
   ggtitle(title)+
   labs(y = "Variable", 
        x = "Importance", 
-       color = " " )
+       color = "" )
 
 
 ggplotly(test, tooltip = c("text"))

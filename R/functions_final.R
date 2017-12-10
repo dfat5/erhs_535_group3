@@ -181,6 +181,7 @@ LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
 
 
 ## Best Variables Function
+
 best_variables <- function(dep_var = "ELU", drug = FALSE, df = efficacy_summary){
   
   
@@ -238,15 +239,18 @@ best_variables <- function(dep_var = "ELU", drug = FALSE, df = efficacy_summary)
     geom_point(aes(x = mse, 
                    y = reorder(Label, mse), 
                    color = Vitro_or_Vivo, 
-                   text = paste('Variable: ', Label, '\n',
-                                'Definition: ', Definition
+                   text = paste('Mean Standard Error: ', round(mse, digits = 2), '\n',
+                                'Variable: ', Label, '\n',
+                                'Definition: ', str_wrap(Definition, width = 40)
                    )))+
     theme_minimal()+
     ggtitle(title)+
     labs(y = "Variable", 
          x = "Importance", 
-         color = "In Vivo, In Vitro, or Drug" )
+         color = "" )
   
   
   ggplotly(test, tooltip = c("text"))
+  
 }
+
