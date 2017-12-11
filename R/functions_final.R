@@ -10,6 +10,8 @@ library(knitr)
 library(ggbeeswarm)
 library(gghighlight)
 library(tibble)
+library(plotly)
+library(stringr)
 
 
 ## Univariate Plot Function
