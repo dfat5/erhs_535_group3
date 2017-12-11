@@ -75,6 +75,8 @@ comments.
 
 ## Functions, Get Ready!!!:
 
+![](schoolhouserock.jpg)
+Image retrieved from: https://www.pinterest.com/pin/233624299389735946/
 
 ## Visualize univariate variables in a scatterplot function, by drug dose
 
@@ -174,45 +176,58 @@ drugmouse_spleen
 
 ## Regression Tree Function
 
-- This function will input all of the efficacy summary variables as independent variables and let you choose the dependent variable (lung efficacy or spleen efficacy).
+- *Goal:* This function will tell you the type and level of independent variable that are most important in determining the level of dependent variable of interest (ELU or ESP).
+- Output is a regression tree plot based on the parameters you choose (examples below)
+
+## Regression Tree Function code
 
 ```{r, echo=TRUE, eval=FALSE}
 rpart(ELU ~  drug + dosage + level + 
       plasma + `Uninvolved lung` + `Rim (of Lesion)` + 
-      `Outer Caseum` + `Inner Caseum` + `Standard Lung` + 
-      `Standard Lesion` + cLogP + `Human Plasma Binding` + 
-      `Mouse Plasma Binding` + `MIC Erdman Strain` + 
-      `MIC Erdman Strain with Serum` + `MIC rv strain` + 
-      `Caseum binding` + `Macrophage Uptake (Ratio)`,
+      `Outer Caseum` + `Inner Caseum` + 
+        `Standard Lung` + `Standard Lesion` + cLogP + 
+        `Human Plasma Binding` + 
+        `Mouse Plasma Binding` + `MIC Erdman Strain` + 
+      `MIC Erdman Strain with Serum` + 
+        `MIC rv strain` + `Caseum binding` + 
+        `Macrophage Uptake (Ratio)`,
       data = function_data, 
-      control = rpart.control(cp = -1, minsplit = min_split, 
+      control = rpart.control(cp = -1, 
+                              minsplit = min_split, 
                              minbucket = min_bucket))
 ```
 
-## Regression Tree Function
+## Regression Tree Function input parameters
 
-- Parameters:
-- dep_var options: "ELU" (lung efficacy) or "ESP" (spleen efficacy)
-- min_split: numeric input indicating minimum # observations for a split to be attempted
-- min_bucket: numeric input indicating minimum # observations in a terminal node
+- `dep_var` options: "ELU" (lung efficacy) or "ESP" (spleen efficacy)
+- `min_split`: numeric input indicating minimum # observations for a split to be attempted
+- `min_bucket`: numeric input indicating minimum # observations in a terminal node
+- `data = efficacy_summary` (default; must use this to run properly)
 
 ```{r, echo=TRUE, eval=FALSE}
 regression_tree(dep_var = "ELU", min_split = 8, 
                 min_bucket = 6)
 ```
 
-## Regression Tree Function
-
-- Output:
+## Regression Tree Function example (ELU)
 
 ```{r}
-regression_tree(dep_var = "ELU", min_split = 8, min_bucket = 6)
+regression_tree(dep_var = "ELU", min_split = 8, min_bucket = 4)
 ```
 
+## Regression Tree Function interpretation
 
-## Regression Tree Function: Interpretation
+- The number at the top of each node is indicating the mean of the outcome variable for the observations in that node (mean of 1.5 for node 1). 
+- Starting from node 1, the first split is made so that it leads to the greatest possible reduction in residual sum of squares (RSS). 
+- Node 3 is a terminal node because it only has 4 observations (parameter: `min_bucket` = 4). 
+- Node 2 splits again because it has 16 observations (parameter: `min_split` = 8). 
+- This process continues until either the `min_split` or the `min_bucket` parameters are fulfilled for each node.  
 
-- The number at the top of each node is indicating the mean of the outcome variable for the observations in that node (mean of 1.5 for node 1). Below each node is indicating what each split was based on. Splits are chosen based on a complexity parameter. Starting from node 1, the first split is made so that it leads to the greatest possible reduction in RSS. Node 3 is a terminal node because it only has 4 observations, which was the minimum number of observations a node can have to be considered (set in our function parameters). Given the 16 observations in node 2, another split is made that again gives the greatest possible reduction in RSS. This process continues until either the min_split or the min_bucket parameters are fulfilled for each node from the preset function parameters.  
+## Regression Tree Function example (ESP)
+
+```{r}
+regression_tree(dep_var = "ESP", min_split = 8, min_bucket = 4)
+```
 
 
 ## LASSO Function

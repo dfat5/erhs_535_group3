@@ -151,7 +151,7 @@ regression_tree <- function(dep_var = "ELU", min_split = 8, min_bucket = 6,
                   control = rpart.control(cp = -1, minsplit = min_split, 
                                           minbucket = min_bucket))
   }
-  return(rpart.plot(tree))
+  return(rpart.plot(tree, type = 4, extra = 101, shadow.col = "gray", nn = TRUE, branch.lty=3))
 }
 
 ## Lasso Function
