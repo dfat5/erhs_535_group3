@@ -9,6 +9,11 @@ output: word_document
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
+```{r, include=FALSE}
+source("../R/practice_data.R")
+source("../R/functions_final.R")
+```
+
 The report should be no longer than 5 pages (using default font size, line spacing, etc. for RMarkdown documents; if you include figures or tables that show output from your functions, these do not need to count towards that page limit). Be sure to show examples of using your functions in your Word report.
 
 # Introduction/Background/Objective
@@ -42,6 +47,54 @@ function), you can include that
 - If you want an extra challenge, try to use the Roxygen2 syntax in
 writing these descriptions. Otherwise, you can write them in code
 comments.
+
+## Regression Tree Function:
+
+The regression tree function is used as a way to helps us determine which independent variables have the largest influence on our outcomes of lung efficacy (ELU) or spleen efficacy (ESP). We begin with a tidy dataset of all observations (in this case, 20) called `efficacy_summary`. We then choose an independent variable of interest; here we have chosen ELU. To run the function, we input ELU along with all of the independent variables from the dataset into the `rpart()` function, as seen in the code below. In the function, we also specify the dataset from which to pull the variables, as well as control parameters that determine how the function runs. 
+
+#### Regression Tree code:
+```{r, echo=TRUE, eval=FALSE}
+rpart(ELU ~  drug + dosage + level + 
+      plasma + `Uninvolved lung` + `Rim (of Lesion)` + 
+      `Outer Caseum` + `Inner Caseum` + 
+        `Standard Lung` + `Standard Lesion` + cLogP + 
+        `Human Plasma Binding` + 
+        `Mouse Plasma Binding` + `MIC Erdman Strain` + 
+      `MIC Erdman Strain with Serum` + 
+        `MIC rv strain` + `Caseum binding` + 
+        `Macrophage Uptake (Ratio)`
+```
+
+After trial and error, the regression tree function was completed and ready to use with the following parameters:
+
+- `dep_var`: This is where the user specifies the dependent variable of interest. Options include "ELU" (lung efficacy) or "ESP" (spleen efficacy).
+- `min_split`: This is a numeric input indicating the minimum number of observations for a split to be attempted in the regression tree.
+- `min_bucket`: This is another numeric input indicating the minimum number of observations in a terminal node of the regression tree.
+- `data = efficacy_summary`: This is the default dataset that the function uses. The function will only run with a dataset of this name that has these specific variable names.
+
+The following code gives an example of using the `regression_tree` function with the parameters that were explained above:
+
+#### Regression Tree function input example:
+```{r, echo=TRUE, eval=FALSE}
+regression_tree(dep_var = "ELU", min_split = 8, 
+                min_bucket = 4)
+```
+
+Now that the code and function have been explained, we will run examples of the function and explain what the output is telling us. Consider the following plot given by the code printed above.
+
+#### Regression Tree ELU Example:
+```{r, echo=FALSE, fig.width=7}
+regression_tree(dep_var = "ELU", min_split = 8, min_bucket = 4)
+```
+
+Each "node" in the regression tree is numbered at the top. Within each node is a count of how many observations (for node 1, n=20) and the percent of total observations (for node 1, 100%) that are being explained by that node. The top number within each node is indicating the mean of the outcome variable for the observations in that node. In this case, ELU has a mean of 1.5 for node one. 
+
+Starting from node one, the first split is made so that it leads to the greatest possible reduction in residual sum of squares (RSS). At node one, the split was made at a level of 0.29 for variable `MIC rv strain`. This is saying that this variable at this level lead to the greatest reduction in RSS for the outcome of ELU. Continuing on, node three is a terminal node because it only has 4 observations. This happened because in our function parameters we set `min_bucket` = 4. Similarly, node two splits again because it has 16 observations. This happened because in our function parameters we set `min_split` = 8. This process continues until either the `min_split` or the `min_bucket` parameters are fulfilled for each node. The final regression tree above is showing us a step-by-step selection of the most important variables in determining ELU. Below is a similar regression tree  for the outcome of ESP.
+
+#### Regression Tree ESP Example:
+```{r, echo=FALSE, fig.width=7}
+regression_tree(dep_var = "ESP", min_split = 8, min_bucket = 4)
+```
 
 
 # Room for errors: 
