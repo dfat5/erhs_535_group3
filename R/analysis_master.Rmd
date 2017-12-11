@@ -258,7 +258,6 @@ This function outputs raw coefficents and an intercept on an penalized maximum l
 
 The user specifies which dependent variable they would like to use (either ELU or ESP). The user can also specify a dataset they would like to use, if one is not provided then a default dataset is utilized. The function var_importance takes the input and outputs a graph displaying the which variables are the best predictors of the input (either ELU or ESP). 
 ```{r randomForest function}
-
 best_variables <- function(dep_var = "ELU", drug = FALSE, df = efficacy_summary){
   
   
@@ -316,18 +315,23 @@ test <- graph %>%
   geom_point(aes(x = mse, 
                  y = reorder(Label, mse), 
                  color = Vitro_or_Vivo, 
-                 text = paste('Variable: ', Label, '\n',
-                              'Definition: ', Definition
+                 text = paste('Mean Standard Error: ', round(mse, digits = 2), '\n',
+                              'Variable: ', Label, '\n',
+                              'Definition: ', str_wrap(Definition, width = 40)
                               )))+
   theme_minimal()+
   ggtitle(title)+
   labs(y = "Variable", 
        x = "Importance", 
-       color = "In Vivo, In Vitro, or Drug" )
+       color = "" )
 
 
 ggplotly(test, tooltip = c("text"))
+
+
+
 }
+
 ```
 
 ## Interpretation

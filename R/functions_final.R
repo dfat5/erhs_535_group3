@@ -64,7 +64,7 @@ linear_model <- function(peak_trough, dep_var, data = efficacy_summary) {
     geom_point(aes(size = 1 / std.error)) +
     scale_size_continuous(guide = FALSE) +
     theme_few() + 
-    ggtitle(label = "Linear model coefficients as function of independent variables, \n by drug dose and model uncertainty", subtitle = "smaller points have more uncertainty than larger points") +
+    ggtitle(label = "Linear model coefficients as function of independent variables, \n by drug dose and model uncertainty", subtitle = "Smaller points have more uncertainty than larger points") +
     geom_vline(xintercept = 0, color = "cornflower blue") 
   
   coef_plot
@@ -76,28 +76,33 @@ drug_mouse <- function(dep_var, data = clean_2_combined) {
   
   ind_mouse_data <- clean_2_combined %>% 
     select(drug, mouse_id, dep_var) %>% 
-    mutate(drug = as.factor(drug), dep_var = as.numeric(dep_var)) %>% 
-    mutate(mouse_id = as.factor(mouse_id)) %>% 
-    mutate(upper_bound = quantile(dep_var, 0.75, na.rm = TRUE) + (1.5 * IQR(dep_var, na.rm = TRUE))) %>%  
-    mutate(lower_bound = quantile(dep_var, 0.25, na.rm = TRUE) - (1.5 * IQR(dep_var, na.rm = TRUE))) %>% 
-    mutate(outlier = dep_var > upper_bound | dep_var < lower_bound) %>% 
-    group_by(drug) 
-  
-  
+    na.omit(dep_var) %>% 
+    mutate(drug = as.factor(drug)) %>% 
+    mutate(mouse_id = as.factor(mouse_id)) 
+   
   if(dep_var=="lung_efficacy") {ind_mouse_data$vect <- ind_mouse_data$lung_efficacy}
   if(dep_var=="spleen_efficacy") {ind_mouse_data$vect <- ind_mouse_data$spleen_efficacy}
+  
+   ind_mouse_data <- ind_mouse_data %>% 
+    mutate(vect = as.numeric(vect)) %>% #NA error for spleen data
+    na.omit() %>%
+    mutate(upper_bound = quantile(vect, 0.75, na.rm = TRUE) + (1.5 * IQR(vect, na.rm = TRUE))) %>%  
+    mutate(lower_bound = quantile(vect, 0.25, na.rm = TRUE) - (1.5 * IQR(vect, na.rm = TRUE))) %>% 
+    mutate(outlier = vect > upper_bound | vect < lower_bound) %>% 
+    group_by(drug) 
   
   ind_mouse_plot <- ind_mouse_data %>%  
     gghighlight_point(aes(x = drug, y = vect), outlier == TRUE, label_key = mouse_id, fill, unhighlighted_colour = alpha("blue")) +
     geom_beeswarm() +
     ylab("Colony Forming Units") +
-    ggtitle("Efficacy by individual mouse", subtitle = "Outliers labelled by mouse ID") +
+    ggtitle("Efficacy of each drug, by mouse", subtitle = "Outliers labelled by mouse ID") +
     theme_few()
   
   ind_mouse_plot 
   
 }
 
+test4 <- drug_mouse(dep_var = "lung_efficacy")
 
 ## Regression Tree Function
 regression_tree <- function(dep_var = "ELU", min_split = 8, min_bucket = 6, 
@@ -181,6 +186,7 @@ LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
 
 
 ## Best Variables Function
+
 best_variables <- function(dep_var = "ELU", drug = FALSE, df = efficacy_summary){
   
   
@@ -238,15 +244,18 @@ best_variables <- function(dep_var = "ELU", drug = FALSE, df = efficacy_summary)
     geom_point(aes(x = mse, 
                    y = reorder(Label, mse), 
                    color = Vitro_or_Vivo, 
-                   text = paste('Variable: ', Label, '\n',
-                                'Definition: ', Definition
+                   text = paste('Mean Standard Error: ', round(mse, digits = 2), '\n',
+                                'Variable: ', Label, '\n',
+                                'Definition: ', str_wrap(Definition, width = 40)
                    )))+
     theme_minimal()+
     ggtitle(title)+
     labs(y = "Variable", 
          x = "Importance", 
-         color = "In Vivo, In Vitro, or Drug" )
+         color = "" )
   
   
   ggplotly(test, tooltip = c("text"))
+  
 }
+
