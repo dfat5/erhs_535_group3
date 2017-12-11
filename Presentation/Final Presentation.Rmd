@@ -291,63 +291,15 @@ coeff %>%
 ## RandomForest Function
 
 - The user specifies which dependent variable they would like to use (either ELU or ESP). The user can also specify a dataset they would like to use, if one is not provided then a default dataset is utilized. The function var_importance takes the input and outputs a graph displaying the which variables are the best predictors of the input (either ELU or ESP). 
-```{r randomForest function}
+```{r randomForest function, echo = true, eval = false}
 
 
-best_variables <- function(dep_var, df = efficacy_summary){
-  
-  
-  title <- paste0 ("Predicing Variable Importance Using ", as.character(dep_var))
-  
-  if(dep_var == "ELU"){
-  dataset <- df %>% 
-    select(-ESP) %>% 
-    mutate(huPPB = as.numeric(huPPB), 
-         muPPB = as.numeric(muPPB), 
-         dosage = as.factor(dosage), 
-         dose_int = as.factor(dose_int), 
-         level = as.factor(level), 
-         drug = as.factor(drug))
 
 efficacy.rf <- randomForest( ELU~ ., data =dataset,
               na.action = na.roughfix,
-                        ntree= 1000, 
+                        ntree= 500, 
                         importance = TRUE)
-  }
   
-  if (dep_var == "ESP"){
-    dataset <- df %>% 
-      select(-ELU) %>% 
-    mutate(huPPB = as.numeric(huPPB), 
-         muPPB = as.numeric(muPPB), 
-         dosage = as.factor(dosage), 
-         dose_int = as.factor(dose_int), 
-         level = as.factor(level), 
-         drug = as.factor(drug))
-
-efficacy.rf <- randomForest( ESP ~ ., data =dataset,
-              na.action = na.roughfix,
-                        ntree= 1000, 
-                        importance = TRUE)
-  }
-  
-graph <-importance(efficacy.rf, type = 1) %>% 
-  as.data.frame() %>% 
-  rownames_to_column() %>% 
-  rename(variable = rowname, 
-         mse = `%IncMSE`) 
-
-
-
-graph %>% 
-  filter(mse > 0) %>% 
-  ggplot()+
-  geom_point(aes(x = mse, y = reorder(variable, mse)))+
-  theme_minimal()+
-  ggtitle(title)+
-  labs(y = "Variable", 
-       x = "Importance")
-}
 ```
 
 ## Testing Random Forest
