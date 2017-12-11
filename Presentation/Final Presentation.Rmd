@@ -30,7 +30,7 @@ source("../R/functions_final.R")
 
 Here, we will try to discover if there are characteristics of the drugs that are associated with effectiveness against TB. The dependent variables tested included drug concentrations in the lung tissue and spleen. The independent variables included several _in vivo_ (mouse model) and _in vitro_ tests that were performed by the TB research group.
 
-## Idea development: 
+## Idea development: Ethan
 
 - Describe the different ideas your group explored. What were the biggest challenges in this stage? For any ideas that didn’t pan out, what were the key constraints? Also describe how you would tackle this problem if you were starting over.
 
@@ -291,7 +291,7 @@ coeff %>%
 ## RandomForest Function
 
 - The user specifies which dependent variable they would like to use (either ELU or ESP). The user can also specify a dataset they would like to use, if one is not provided then a default dataset is utilized. The function var_importance takes the input and outputs a graph displaying the which variables are the best predictors of the input (either ELU or ESP). 
-```{r randomForest function, echo = true, eval = false}
+```{r randomForest function, echo = TRUE, eval = FALSE}
 
 
 
