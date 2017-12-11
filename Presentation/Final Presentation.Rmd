@@ -30,28 +30,13 @@ source("../R/functions_final.R")
 
 Here, we will try to discover if there are characteristics of the drugs that are associated with effectiveness against TB. The dependent variables tested included drug concentrations in the lung tissue and spleen. The independent variables included several _in vivo_ (mouse model) and _in vitro_ tests that were performed by the TB research group.
 
-## Idea development: Ethan
+## Idea development:
 
-- Describe the different ideas your group explored. What were the biggest challenges in this stage? For any ideas that didn’t pan out, what were the key constraints? Also describe how you would tackle this problem if you were starting over.
-
-We explored various models to see if there were concordant associations detected between independent and dependent variables. It was challenging to make strong associations because the dataset provided at this stage was small and did not include many drugs, however, we did discover similar patterns with certain _in vitro_ or _in vivo_ tests and ELU. We also explored changes in these associations by different drug doseage, and interestingly drug dose appears to be an effect modifier on some of the relationships, so that will be interest to follow up on as more data is provided. 
-
-## Key functions: 
-
-- Describe the final functions / app framework you decided on. Explain why you picked these. For functions, include documentation for the functions:
-- Write a brief title for the function (< 8 words) and a brief description
-(3–4 sentences).
-- Define all parameters. For example, if you have a df parameter,
-explain that this is the dataframe that will be modeled / visualized. If
-it must have certain column with certain names, specify that.
-- Define what the functions will output (e.g., “A ggplot object showing
-. . . ” or “The model output object from running a . . . ”).
-- If you have a reference (e.g., for a model you’re fitting in the
-function), you can include that
-- If you want an extra challenge, try to use the Roxygen2 syntax in
-writing these descriptions. Otherwise, you can write them in code
-comments.
-
+- Getting to know the dataset 
+- Exploring different visualization techniques
+- Try various models to see if there were associations detected between independent and dependent variables
+- Choose a model or technique and learn how to use it more in depth
+- Write a function for each of our models, making them easy to use and giving useful output
 
 ## Room for errors: 
 
