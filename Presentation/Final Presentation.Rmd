@@ -70,7 +70,13 @@ comments.
 
 ## Next steps: 
 
-- Include a section where you describe what you think are interesting next steps, i.e., what you would pursue next if you were continuing work on this project. Lay out explicitly a few ideas (2–3) that you think would be helpful. Be sure, when relevant, to describe how feedback from the project researchers helped in forming these ideas for next steps.
+- Include a section where you describe what you think are interesting next steps, i.e., what you would pursue next if you were continuing work on this project. Lay out explicitly a few ideas (2–3) that you think would be helpful. Be sure, when relevant, to describe how feedback from the project researchers helped in forming these ideas for next steps. 
+
+-The next step is to include more data representing more drugs
+
+-Validating the models (for RandomForest and Lasso) would help us understand the predictive power of the model to determine drug efficacy. The data can be subsetted and tested.
+
+-A function could be written that runs all of the models and outputs the coefficients
 
 
 ## Functions, Get Ready!!!:
