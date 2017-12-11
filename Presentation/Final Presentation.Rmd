@@ -12,24 +12,29 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r, include=FALSE}
-source("../R/functions_final.R")
 source("../R/practice_data.R")
+source("../R/functions_final.R")
 ```
 
 ## Group 3 Objective: Association between dependent and independent variables
 
-- Create summaries and visualizations of how the dependent variable is associated with different independent variables. Here, we will try to discover if there are characteristics of the drugs that are associated with effectiveness against TB. This group will need to come up with ways (and code) to analyze that in the data. This might include generalized linear models, scatterplots, and possibly other supervised learning methods. 
+- The objectives were to create summaries and visualizations of how the dependent variable is associated with the different independent variables. Our goal was to develop different models to analyze these associations in the data. Our work included:
+- generalized linear models
+- scatterplots
+- supervised learning methods, including RandomForest, Regression Trees, and Lasso.  
 
 
 ## Rationale: 
 
 - Explain what you were hoping to achieve in writing the functions / app framework that your group created.
 
+Here, we will try to discover if there are characteristics of the drugs that are associated with effectiveness against TB. The dependent variables tested included drug concentrations in the lung tissue and spleen. The independent variables included several _in vivo_ (mouse model) and _in vitro_ tests that were performed by the TB research group.
 
 ## Idea development: 
 
 - Describe the different ideas your group explored. What were the biggest challenges in this stage? For any ideas that didn’t pan out, what were the key constraints? Also describe how you would tackle this problem if you were starting over.
 
+We explored various models to see if there were concordant associations detected between independent and dependent variables. It was challenging to make strong associations because the dataset provided at this stage was small and did not include many drugs, however, we did discover similar patterns with certain _in vitro_ or _in vivo_ tests and ELU. We also explored changes in these associations by different drug doseage, and interestingly drug dose appears to be an effect modifier on some of the relationships, so that will be interest to follow up on as more data is provided. 
 
 ## Key functions: 
 
@@ -50,10 +55,17 @@ comments.
 
 ## Room for errors: 
 
-- So far, we have focused on getting working prototypes, without making sure they’re error-proof and robust to a user doing something non-standard. Identify three things a user could do that could make your functions “break” (i.e., either return an error message or return something other than what you hope they will).
+- So far, we have focused on getting working prototypes, without making sure they’re error-proof and robust to a user doing something non-standard. Identify 3 things a user could do that could make your functions “break” (i.e., either return an error message or return something other than what you hope they will):
 
-- Low or high number of observations in dataset
-- What if drug names changed?
+- Very low or high number of observations in the input dataset
+- One thing that we noticed was in the individual drug data, the "NA", or missing data for spleen_efficacy had a space. This type of variation in how missing data is recorded could cause problems for the functions.
+- If drug names or codes change, this could create potential problems
+
+
+## Room for errors (continued): 
+- If new independent variables or measurements are added to the dataframe
+- The dataset provided included two dose frequency combinations, 50 BID and 100 QD. If these dose and frequency combinations change it could cause problems with some of the functions. 
+- The current functions intake a "tidy" form of the dataframe, `efficacy summary`, with column names including: "drug", "dosage", "dose_int", "level", "PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "ELU", "ESP", "cLogP", "huPPB", "muPPB", "MIC_Erdman", "MICserumErd", "MIC_Rv", "Caseum_binding", and "MacUptake".
 
 
 ## Next steps: 
@@ -61,34 +73,104 @@ comments.
 - Include a section where you describe what you think are interesting next steps, i.e., what you would pursue next if you were continuing work on this project. Lay out explicitly a few ideas (2–3) that you think would be helpful. Be sure, when relevant, to describe how feedback from the project researchers helped in forming these ideas for next steps.
 
 
-## Functions:
+## Functions, Get Ready!!!:
 
 
 ## Visualize univariate variables in a scatterplot function, by drug dose
 
-- To visualize univariate variables correlations with the outcome variables, a faceted scatterplot colored by dose was created. Inputs to this function include `peak_trough`, which evaluates the peak or trough (Cmax or Trough) respectively, of drug following injection. The dep_var options are either ELU or ESP (lung levels and spleen levels, respectively. 
+- *Goal*: To visualize univariate measurement variables correlated with the dependent variables, a faceted scatterplot colored by dose was created. Inputs include:
+- `peak_trough`, which evaluates the peak or trough, respectively, of drug following injection. 
+- The `dep_var` options are either ELU or ESP (lung levels and spleen levels, respectively.
 
 
-## Scatterplot 
+## Scatterplot Input Parameters:
+- function name: `univar_plot`
+- default dataframe: `efficacy_summary`
+- `dep_var` options: "ELU" (lung efficacy) or "ESP" (spleen efficacy)
+- `peak_trough` options: "Cmax"" or "Trough"
 
 
+## Scatterplot- Visualize independent and dependent variable correlations 
+```{r, echo=TRUE, fig.width= 7, fig.height= 4, fig.align='center'}
+#Sample code for function, univar_plot
+scatterplot <- univar_plot(peak_trough = "Cmax", dep_var = "ELU")
+scatterplot
+```
 
-## Interpretation
-
+## Scatterplot Interpretation
+- There appear to be stronger linear relationships with variables, including Caseum_binding ICS and RIM, compared to others. Some relationships are positively correlated (QD, huPPB), whereas others are negatively correlated (Caseum_binding, ICS)
 - It appears that the relationship between independent and dependent variables are dependent on dose for variables cLogP, huPPB, PLA, and SLE. The others are not dependent on dose. 
 - Dose may be an important factor to consider when evaluating the relationship between independent and dependent variables. 
 
 
+## Fitting Linear Models Function
 
-## Fitting Linear Models Function (Example inputs Peak_trough = Cmax, Dep_var = ELU)
+- *Goal*: to fit a linear model regressing dependent on independent variables to assess the relationships between them.
+- Assumptions are the observations are idependent, and identically distributed, the error has a normal distribution, and there is a linear relationship between independent and dependent variables 
+- Inputs to this function include peak_trough, or the dep_var (options are ELU or ESP). 
+- Output from this function provides a plot of the normalized model coefficients by each independent variable
+- *note*: The units of scale for each independent variable were normalized so that we could compare across coeficients. 
 
-- I fitted a linear model regressing dependent on independent variables to assess the relationships between them. Inputs to this function include peak_trough (options are Cmax or trough), or the dep_var (options are ELU or ESP). The units of scale for each variable were normalized so that we could compare across coeficients. 
+## Linear Model Input Parameters:
+- function name: `linear_model`
+- default dataframe: `efficacy_summary`
+- `dep_var` options: "ELU" (lung efficacy) or "ESP" (spleen efficacy)
+- `peak_trough` options: "Cmax"" or "Trough"
 
 
-## Interpretation
+## Linear Model- Visualize independent variable coefficients - ELU
 
--The coefficient plot generated by this function shows each independent variable on the y axis and the respective model coefficient on the x axis. If the coefficient is negative, for example, as it is with MacUptake, an interpretation would be for every unit of change in the MacUptake, the ELU will decrease by 0.5 Units. Therefore, MacUptake has a negative relationship with ELU, decreasing the ELU. The diameter of the point represents the level of certainty of the coeficient in this model.
+```{r, echo=TRUE, fig.width= 6, fig.height= 3, fig.align ='center'}
+#Sample code for function, linear_model (Cmax and ELU)
+linearmodel_ELU <- linear_model(peak_trough = "Cmax", dep_var = "ELU")
+linearmodel_ELU
+```
 
+
+## Linear Model- Visualize independent variable coefficients - ESP
+
+```{r, echo=TRUE, fig.width= 6, fig.height= 3, fig.align ='center'}
+#Sample code for function, linear_model (Cmax and ESP)
+linearmodel_ESP <- linear_model(peak_trough = "Cmax", dep_var = "ESP")
+linearmodel_ESP
+```
+
+
+## Linear Model Interpretation
+
+- The coefficient plot generated by this function shows each independent variable on the y axis and the respective model coefficient on the x axis, for either ELU or ESP. 
+- If the coefficient is negative, for example, as it is with *MacUptake* in the ELU model linear regression model, an interpretation would be for every unit of change in the MacUptake, the ELU will decrease by 0.5 Units. Therefore, MacUptake has a negative relationship with ELU, decreasing the ELU. The diameter of the point represents the level of certainty of the coeficient in this model. This may change as more data is collected for each drug.
+
+
+## Visualizing individual drug efficacy by mouse
+
+- *Goal*: using individual drug data, visualize efficacy in the lung or spleen and detect mouse data outliers in the dataset. 
+- Inputs to this function include lung_efficacy or spleen_efficacy 
+- Output from this function provides a plot of the efficacy by individual mouse.
+
+## Individual drug plot input parameters:
+- function name: `drug_mouse`
+- default dataframe: `cleaned_2_combined`
+- `dep_var` options: "lung_efficacy" or "spleen_efficacy
+
+
+## Individual drug plot
+```{r, echo=TRUE, fig.width = 6, fig.height=4, fig.align='center'}
+#Sample code for function, drug_mouse
+drugmouse_lung <- drug_mouse(dep_var = "lung_efficacy")
+drugmouse_lung
+```
+
+## Individual drug plot
+```{r, echo=TRUE, fig.width = 6, fig.height=4, fig.align='center'}
+#Sample code for function, drug_mouse
+drugmouse_spleen <- drug_mouse(dep_var = "spleen_efficacy")
+drugmouse_spleen
+```
+
+## Individual drug plot interpretation
+
+-There is variation in the efficacy of each drug on lung efficacy in the mouse model. This plot shows the individual mouse variation in efficacy for each drug. Outliers (calculated using the 1.5 X IQR rule), are automatically labelled with the mouse ID. In this dataset for `lung_efficacy`, mouse C for drug 4 was an outlier. There were no outliers present in the `spleen_efficacy` dataset. You can see that untreated mice were had the least efficacy to decrease bacteria in the lung or spleen, respectively.
 
 ## Regression Tree Function
 
