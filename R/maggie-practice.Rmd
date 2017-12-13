@@ -139,7 +139,7 @@ coeff %>%
 }
  
 ```
-```{r}
+```{r ECHO = TRUE, EVAL = FALSE}
 if(){
   stop("STOP IT")
 }
