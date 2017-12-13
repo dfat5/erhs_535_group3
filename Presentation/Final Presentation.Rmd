@@ -3,8 +3,8 @@ title: "Final Presentation"
 author: "Group 3"
 date: "December 4, 2017"
 output:
-  beamer_presentation: default
   slidy_presentation: default
+  beamer_presentation: default
 ---
 
 ```{r setup, include=FALSE}
@@ -67,7 +67,6 @@ We explored various models to see if there were associations detected between in
 -Validating the models (for RandomForest and Lasso) would help us understand the predictive power of the model to determine drug efficacy. The data can be subsetted and tested.
 
 -A function could be written that runs all of the models and outputs the coefficients
->>>>>>> e3e2836853302aed519245e3b1317859f2dda149
 
 
 ## Functions, Get Ready!!!:
@@ -228,18 +227,24 @@ regression_tree(dep_var = "ELU", min_split = 8, min_bucket = 4)
 regression_tree(dep_var = "ESP", min_split = 8, min_bucket = 4)
 ```
 
+## LASSO Function 
+####Least Absolute Shrinkage Selector Operator
+*Background* We want to predict our outcome using the varibles we have in front of us; it is the next generation of step-wise regression anf can handle more varaibles than samples. 
 
-## LASSO Function
+- Shrinks parameters, preventing multicollinearity.
+- Decreases model complexity by coefficient shrinkage (in this case to absolute zero, which is the main difference when compared to ridge regression)
 
-The function for LASSO required the following inputs:
 
-- Dependant varaible 
-- Dose
-- Dataframe, though the dataframe default is efficacy_summary
+## LASSO Function 
+####Least Absolute Shrinkage Selector Operator
+- *Goal*: to fit a model with the correct parameters
+- *Assumptions*:  Still parametric (iid) normal residuals.
+- *Inputs*: Dependant varaible, dose, dataframe (though a default is assuemd)
+- *Output*: coefficients
 
-The output in the end is coefficients with smaller coefficients being resitricted to zero.
 
-```{r}
+## LASSO Function part 1 preparing the data
+```{r echo=TRUE, eval=FALSE}
 LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
   data <- na.omit(df) %>% 
   select_if(is.numeric) %>%
@@ -249,22 +254,20 @@ response <- df %>%
   select(dep_var)
 
 predictors <- df %>%
-  select(c("PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "cLogP", "huPPB", "muPPB", "MIC_Erdman", 'MICserumErd', "MIC_Rv", "Caseum_binding", "MacUptake"))
+  select(c("PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "cLogP",
+           "huPPB", "muPPB", "MIC_Erdman", 'MICserumErd',
+           "MIC_Rv", "Caseum_binding", "MacUptake"))
 
 y <- as.numeric(unlist(response))
 x <- as.matrix(predictors)
+```
 
+## LASSO Function part 2, glmnet
+```{r echo=TRUE, eval=FALSE}
 fit = glmnet(x, y)
 
 coeff <- coef(fit,s=0.1)
 coeff <- as.data.frame(as.matrix(coeff))
-
-coeff <- coeff %>% 
-  rownames_to_column() %>% 
-  filter(coeff > 0) 
-  colnames(coeff) <- c("predictor", "coeff")
-coeff %>% 
-  kable()
 }
 ```
 
