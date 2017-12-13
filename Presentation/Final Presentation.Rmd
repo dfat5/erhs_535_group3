@@ -284,11 +284,7 @@ LASSO_model(dep_var = "ELU", dose = 50)
 LASSO_model(dep_var = "ELU", dose = 50)
 ```
 
-
-## Interpretation: 
-
-- This function outputs raw coefficents and an intercept on an penalized maximum likelihood model. Models dropped from the model are represented with zeros. It computes a LASSO penalty for small coefficents and drops them, resulting in only the coef with the most leverage remaining.  
-
+- These are the raw coefficents and an intercept on an penalized maximum likelihood model. It computes a penalty for small coefficents and drops them, resulting in only the coefficents with the most predictive power remaining.  
 
 
 ## RandomForest Function
@@ -339,4 +335,4 @@ These functions may be prone to several errors if:
 
 - Validating the models (for RandomForest and Lasso) would help us understand the predictive power of the model to determine drug efficacy. The data can be subsetted and tested.
 
-- A function could be written that runs all of the models and outputs the coefficients
+- These predictive models could be combine in a function to output all of the coefficients; then compared. 
