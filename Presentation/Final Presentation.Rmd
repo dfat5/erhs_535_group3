@@ -234,6 +234,10 @@ regression_tree(dep_var = "ESP", min_split = 8, min_bucket = 4)
 - Shrinks parameters, preventing multicollinearity.
 - Decreases model complexity by coefficient shrinkage (in this case to absolute zero, which is the main difference when compared to ridge regression)
 
+##Example
+```{r, out.width = "800px"}
+knitr::include_graphics("LASSO.png")
+```
 
 ## LASSO Function 
 ####Least Absolute Shrinkage Selector Operator
@@ -272,9 +276,12 @@ coeff <- as.data.frame(as.matrix(coeff))
 ```
 
 ## Testing LASSO function:
+```{r echo=TRUE, eval=FALSE}
+LASSO_model(dep_var = "ELU", dose = 50)
+```
 
 ```{r}
-#LASSO_model(dep_var = "ELU", dose = 100)
+LASSO_model(dep_var = "ELU", dose = 50)
 ```
 
 
