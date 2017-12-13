@@ -10,6 +10,8 @@ library(knitr)
 library(ggbeeswarm)
 library(gghighlight)
 library(tibble)
+library(plotly)
+library(stringr)
 
 
 ## Univariate Plot Function
@@ -64,7 +66,7 @@ linear_model <- function(peak_trough, dep_var, data = efficacy_summary) {
     geom_point(aes(size = 1 / std.error)) +
     scale_size_continuous(guide = FALSE) +
     theme_few() + 
-    ggtitle(label = "Linear model coefficients as function of independent variables, \n by drug dose and model uncertainty", subtitle = "Smaller points have more uncertainty than larger points") +
+    ggtitle(label = "Linear model coefficients as function of independent \n variables, by drug dose and model uncertainty", subtitle = "Smaller points have more uncertainty than larger points") +
     geom_vline(xintercept = 0, color = "cornflower blue") 
   
   coef_plot
