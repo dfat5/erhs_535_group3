@@ -130,8 +130,12 @@ add drug exlude if include drug is false select it out
 
 best_variables("ELU", TRUE)
 #best_variables("ESP")
-export(best_variables())
-
+install.packages("webshot")
+library(webshot)
+graph <- best_variables()
+export(p = graph, file = "graph.png")
+webshot::install_phantomjs()
+?export
 ?plotly_IMAGE
 
 ```

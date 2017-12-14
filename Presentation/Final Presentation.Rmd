@@ -259,7 +259,22 @@ LASSO_model(dep_var = "ELU", dose = 50)
 
 ## RandomForest Function
 
-- The user specifies which dependent variable they would like to use (either ELU or ESP). The user can also specify a dataset they would like to use, if one is not provided then a default dataset is utilized. The function var_importance takes the input and outputs a graph displaying the which variables are the best predictors of the input (either ELU or ESP). 
+- *Goal* Determine which variables are the most important for predicting either lung efficacy (`ELU`) or spleen efficacy (`ESP`)
+
+- *Output* Interactive plotly graph displaying levels of importance
+
+
+## RandomForest Input
+
+  -  `dep_var`: The user must specify the dependent variable of interest which can either be “`ELU`” or “`ESP`”. If the user does not choose a dependent variable the function automatically utilizes “`ELU`”. 
+
+  - `drug`: This call line allows the user to either include or exclude the variable `drug` which corresponds to the drug being tested. The user can either specify TRUE or FALSE. The function defaults to FALSE where the variable `drug` is excluded. 
+  
+  -  `df`: This call specifies which data frame to use for the function. The default data frame is efficacy summary; however, the user can specify another data frame if they choose.
+  
+  
+## Random Forest Code Example 
+
 ```{r randomForest function, echo = TRUE, eval = FALSE}
 
 
@@ -271,16 +286,28 @@ efficacy.rf <- randomForest( ELU~ ., data =dataset,
   
 ```
 
-## Testing Random Forest
+## Random Forest example with `ELU`
 
-```{r testing function}
-best_variables("ELU")
+```{r testing function, echo = TRUE}
+best_variables("ELU", drug = FALSE)
+
+```
+
+## Random Forest example with `ESP`
+
+```{r testing function 2, echo = TRUE}
+best_variables("ESP", drug = TRUE)
 
 ```
 
 ## Interpretation
 
-- This function utilizes the function randomForest to predict which variables are the most important predictors of the associated outcome. This model works by randomly creating small data nodes that are split using the best predictor from a subset of predictors randomly chosen at each node. In order to determine variable importance, the algorithm looks at how much the predictive error increases as all variables remain unchanged while one is permuted. The resulting output shows the % increase in the mean standard error for each variable considered individually. The higher the number the more important the variable for model building. 
+- The larger the mean squared error the more important the variable. 
+
+- `MIC Rv Strain`, `Mouse Plasma Binding`, and `Caseum Binding` are the most important
+
+- In vitro variables seem to be better predictors than in vivo variables 
+
 
 
 ## Room for errors: 
