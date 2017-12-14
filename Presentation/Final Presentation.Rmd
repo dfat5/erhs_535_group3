@@ -1,10 +1,10 @@
 ---
 title: "Final Presentation"
 author: "Group 3"
-date: "December 4, 2017"
+date: "December 14, 2017"
 output:
-  beamer_presentation: default
   slidy_presentation: default
+  beamer_presentation: default
 ---
 
 ```{r setup, include=FALSE}
@@ -30,11 +30,7 @@ The objectives were to create summaries and visualizations of how the dependent 
 
 - The dependent variables tested included drug concentrations in the lung tissue and spleen. The independent variables included several _in vivo_ (mouse model) and _in vitro_ tests that were performed by the TB research group.
 
-<<<<<<< HEAD
-## Idea development: 
 
-We explored various models to see if there were associations detected between independent and dependent variables. It was challenging to make strong conclusions about association in this analysis because the dataset provided at this stage was small and did not include many drugs, however, we did discover similar patterns with certain _in vitro_ or _in vivo_ tests and ELU. We also explored changes in these associations by different drug doseage, and interestingly drug dose appears to be an effect modifier on some of the relationships, so that will be interest to follow up on as more data is provided. 
-=======
 ## Idea development:
 
 - Getting to know the dataset 
@@ -42,33 +38,6 @@ We explored various models to see if there were associations detected between in
 - Try various models to see if there were associations detected between independent and dependent variables
 - Choose a model or technique and learn how to use it more in depth
 - Write a function for each of our models, making them easy to use and giving useful output
-
-## Room for errors: 
-
-- So far, we have focused on getting working prototypes, without making sure they’re error-proof and robust to a user doing something non-standard. Identify 3 things a user could do that could make your functions “break” (i.e., either return an error message or return something other than what you hope they will):
-
-- Very low or high number of observations in the input dataset
-- One thing that we noticed was in the individual drug data, the "NA", or missing data for spleen_efficacy had a space. This type of variation in how missing data is recorded could cause problems for the functions.
-- If drug names or codes change, this could create potential problems
-
-
-## Room for errors (continued): 
-- If new independent variables or measurements are added to the dataframe
-- The dataset provided included two dose frequency combinations, 50 BID and 100 QD. If these dose and frequency combinations change it could cause problems with some of the functions. 
-- The current functions intake a "tidy" form of the dataframe, `efficacy summary`, with column names including: "drug", "dosage", "dose_int", "level", "PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "ELU", "ESP", "cLogP", "huPPB", "muPPB", "MIC_Erdman", "MICserumErd", "MIC_Rv", "Caseum_binding", and "MacUptake".
-
-
-## Next steps: 
-
-- Include a section where you describe what you think are interesting next steps, i.e., what you would pursue next if you were continuing work on this project. Lay out explicitly a few ideas (2–3) that you think would be helpful. Be sure, when relevant, to describe how feedback from the project researchers helped in forming these ideas for next steps. 
-
--The next step is to include more data representing more drugs
-
--Validating the models (for RandomForest and Lasso) would help us understand the predictive power of the model to determine drug efficacy. The data can be subsetted and tested.
-
--A function could be written that runs all of the models and outputs the coefficients
->>>>>>> e3e2836853302aed519245e3b1317859f2dda149
-
 
 ## Functions, Get Ready!!!:
 
@@ -205,7 +174,7 @@ rpart(ELU ~  drug + dosage + level +
 
 ```{r, echo=TRUE, eval=FALSE}
 regression_tree(dep_var = "ELU", min_split = 8, 
-                min_bucket = 6)
+                min_bucket = 4)
 ```
 
 ## Regression Tree Function example (ELU)
@@ -228,18 +197,28 @@ regression_tree(dep_var = "ELU", min_split = 8, min_bucket = 4)
 regression_tree(dep_var = "ESP", min_split = 8, min_bucket = 4)
 ```
 
+## LASSO Function 
+####Least Absolute Shrinkage Selector Operator
+*Background* We want to predict our outcome using the varibles we have in front of us; it is the next generation of step-wise regression anf can handle more varaibles than samples. 
 
-## LASSO Function
+- Shrinks parameters, preventing multicollinearity.
+- Decreases model complexity by coefficient shrinkage (in this case to absolute zero, which is the main difference when compared to ridge regression)
 
-The function for LASSO required the following inputs:
+##Example
+```{r, out.width = "800px"}
+knitr::include_graphics("LASSO.png")
+```
 
-- Dependant varaible 
-- Dose
-- Dataframe, though the dataframe default is efficacy_summary
+## LASSO Function 
+####Least Absolute Shrinkage Selector Operator
+- *Goal*: to fit a model with the correct parameters
+- *Assumptions*:  Still parametric (iid) normal residuals.
+- *Inputs*: Dependant varaible, dose, dataframe (though a default is assuemd)
+- *Output*: coefficients
 
-The output in the end is coefficients with smaller coefficients being resitricted to zero.
 
-```{r}
+## LASSO Function part 1 preparing the data
+```{r echo=TRUE, eval=FALSE}
 LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
   data <- na.omit(df) %>% 
   select_if(is.numeric) %>%
@@ -249,41 +228,53 @@ response <- df %>%
   select(dep_var)
 
 predictors <- df %>%
-  select(c("PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "cLogP", "huPPB", "muPPB", "MIC_Erdman", 'MICserumErd', "MIC_Rv", "Caseum_binding", "MacUptake"))
+  select(c("PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "cLogP",
+           "huPPB", "muPPB", "MIC_Erdman", 'MICserumErd',
+           "MIC_Rv", "Caseum_binding", "MacUptake"))
 
 y <- as.numeric(unlist(response))
 x <- as.matrix(predictors)
+```
 
+## LASSO Function part 2, glmnet
+```{r echo=TRUE, eval=FALSE}
 fit = glmnet(x, y)
 
 coeff <- coef(fit,s=0.1)
 coeff <- as.data.frame(as.matrix(coeff))
-
-coeff <- coeff %>% 
-  rownames_to_column() %>% 
-  filter(coeff > 0) 
-  colnames(coeff) <- c("predictor", "coeff")
-coeff %>% 
-  kable()
 }
 ```
 
 ## Testing LASSO function:
-
-```{r}
-#LASSO_model(dep_var = "ELU", dose = 100)
+```{r echo=TRUE, eval=FALSE}
+LASSO_model(dep_var = "ELU", dose = 50)
 ```
 
+```{r}
+LASSO_model(dep_var = "ELU", dose = 50)
+```
 
-## Interpretation: 
-
-- This function outputs raw coefficents and an intercept on an penalized maximum likelihood model. Models dropped from the model are represented with zeros. It computes a LASSO penalty for small coefficents and drops them, resulting in only the coef with the most leverage remaining.  
-
+- These are the raw coefficents and an intercept on an penalized maximum likelihood model. It computes a penalty for small coefficents and drops them, resulting in only the coefficents with the most predictive power remaining.  
 
 
 ## RandomForest Function
 
-- The user specifies which dependent variable they would like to use (either ELU or ESP). The user can also specify a dataset they would like to use, if one is not provided then a default dataset is utilized. The function var_importance takes the input and outputs a graph displaying the which variables are the best predictors of the input (either ELU or ESP). 
+- *Goal* Determine which variables are the most important for predicting either lung efficacy (`ELU`) or spleen efficacy (`ESP`)
+
+- *Output* Interactive plotly graph displaying levels of importance
+
+
+## RandomForest Input
+
+  -  `dep_var`: The user must specify the dependent variable of interest which can either be “`ELU`” or “`ESP`”. If the user does not choose a dependent variable the function automatically utilizes “`ELU`”. 
+
+  - `drug`: This call line allows the user to either include or exclude the variable `drug` which corresponds to the drug being tested. The user can either specify TRUE or FALSE. The function defaults to FALSE where the variable `drug` is excluded. 
+  
+  -  `df`: This call specifies which data frame to use for the function. The default data frame is efficacy summary; however, the user can specify another data frame if they choose.
+  
+  
+## Random Forest Code Example 
+
 ```{r randomForest function, echo = TRUE, eval = FALSE}
 
 
@@ -295,16 +286,28 @@ efficacy.rf <- randomForest( ELU~ ., data =dataset,
   
 ```
 
-## Testing Random Forest
+## Random Forest example with `ELU`
 
-```{r testing function}
-best_variables("ELU")
+```{r testing function, echo = TRUE}
+best_variables("ELU", drug = FALSE)
+
+```
+
+## Random Forest example with `ESP`
+
+```{r testing function 2, echo = TRUE}
+best_variables("ESP", drug = TRUE)
 
 ```
 
 ## Interpretation
 
-- This function utilizes the function randomForest to predict which variables are the most important predictors of the associated outcome. This model works by randomly creating small data nodes that are split using the best predictor from a subset of predictors randomly chosen at each node. In order to determine variable importance, the algorithm looks at how much the predictive error increases as all variables remain unchanged while one is permuted. The resulting output shows the % increase in the mean standard error for each variable considered individually. The higher the number the more important the variable for model building. 
+- The larger the mean squared error the more important the variable. 
+
+- `MIC Rv Strain`, `Mouse Plasma Binding`, and `Caseum Binding` are the most important
+
+- In vitro variables seem to be better predictors than in vivo variables 
+
 
 
 ## Room for errors: 
@@ -329,4 +332,4 @@ These functions may be prone to several errors if:
 
 - Validating the models (for RandomForest and Lasso) would help us understand the predictive power of the model to determine drug efficacy. The data can be subsetted and tested.
 
-- A function could be written that runs all of the models and outputs the coefficients
+- These predictive models could be combine in a function to output all of the coefficients; then compared. 

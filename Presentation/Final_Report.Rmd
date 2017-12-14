@@ -1,10 +1,10 @@
 ---
-title: "Group 3: Modelling Dependent ~ Independent Variables "
+title: 'Group 3: Modeling Dependent ~ Independent Variables '
 author: "Ethan Walker, Drew Faturos, Maggie Weinroth, Kate Huebner"
-date: "December 4, 2017"
+date: "December 14, 2017"
 output:
-  pdf_document: default
   word_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -16,10 +16,15 @@ source("../R/practice_data.R")
 source("../R/functions_final.R")
 ```
 # Introduction
-  The objectives of this analysis were to create summaries and visualizations of how the dependent variable is associated with the different independent variables. To this end, we developed different models to analyze these associations in the data. Our work included creating scatterplots, linear models, and supervised learning methods, including RandomForest, Regression Trees, and Lasso. The rationale for this is because if we can discover specific characteristics of the drugs that are associated with effectiveness against Tuberculosis (TB), this will help researchers understand possible drug mechanisms in the body using a mouse model. Different models were used to see if the significant associations were consistent between models.The dependent variables tested included drug concentrations in the lung tissue (`ELU`) and spleen (`ESP`). The independent variables included several _in vivo_ (mouse model) and _in vitro_ tests that were performed by the TB research group.
-  We explored thesevarious models to see if there were associations detected between independent and dependent variables. It was challenging to make strong conclusions about associations based on this preliminary analysis because the dataset provided at this stage was small and did not include many drugs, however, we did discover similar patterns with certain _in vitro_ or _in vivo_ tests and ELU. We also explored changes in these associations by different drug doseage, and interestingly drug dose appears to be an effect modifier on some of the relationships, so that will be interest to follow up on as more data is provided. 
+  The objectives of this analysis were to create summaries and visualizations of how the dependent variable is associated with the different independent variables. To this end, we developed different models to analyze these associations in the data. Our work included creating scatterplots, linear models, and supervised learning methods such as RandomForest, Regression Trees, and Lasso. The rationale for this is because if we can discover specific characteristics of the drugs that are associated with effectiveness against Tuberculosis (TB), this will help researchers understand possible drug mechanisms in the body using a mouse model. Different models were used to see if the significant associations were consistent between models. The dependent variables tested included drug concentrations in the lung tissue (`ELU`) and spleen (`ESP`). The independent variables included several _in vivo_ (mouse model) and _in vitro_ tests that were performed by the TB research group.
+  We explored these various models to see if there were associations detected between independent and dependent variables. It was challenging to make strong conclusions about associations based on this preliminary analysis because the dataset provided at this stage was small and did not include many drugs. However, we did discover similar patterns with certain _in vitro_ or _in vivo_ tests and ELU. We also explored changes in these associations by different drug doseage, and interestingly drug dose appears to be an effect modifier on some of the relationships, so that will be interesting to follow up on as more data is provided.  
 
-# Function 1: Visualize independent dependent variable correlations in a scatterplot by drug dose
+
+# Idea development
+  Our initial objective was getting to know the dataset, which was somewhat challenging due to our inexperience with the research that this lab group does. After learning about the variables in the dataset, we explored different visualization techniques that we could use to model the data and give us a representation of how the variables are associated. Using R, we each tried a number of visualization/modeling techniques until we found something that we thought could be useful to the investigators. Once we chose our models or techniques, we each spent time learning the methods behind the model so that we could use it effectively and have a more in-depth understanding of the output. Once we had a good understanding of the models, we then wrote functions so that the models would be easy to use with the datasets we had been given, and so that the output was succinct and relevant. Our final functions are explained in the following paragraphs.
+
+# Functions:
+## Visualize independent dependent variable correlations in a scatterplot by drug dose
   The goal of this function was to visualize how univariate measurement variables correlate with the dependent variables in a scatterplot object. A faceted scatterplot colored by dose was created to explore potential effect modification by dose. The function name was `univar_plot`. The input dataframe for this function, `efficacy summary`, was set as a default from the inputs team. Required user inputs included `peak_trough` (`Cmax` or `Trough`), which evaluates the peak or trough, respectively, of drug following injection. The `dep_var` options are either `ELU` (lung efficacy) or `ESP` (spleen efficacy).
   The function first filters the efficacy_summary dataframe rows to include either Cmax or Trough, depending on the user's specifications, then it uses the dplyr package `gather` function to create a new column called `independent_var` and each independent variable associated measurement in `independent_measure`. `Select` is then subsequently used to retain columns `drug`, `dosage`, `dose_int`, `level`, `dep_var`, `indep_measure`, and `independent_var`). The output of this function is a ggplot2 object that is faceted by independent variable, with the dependent variable (ELU or ESP) on the y axis, and colored by dose. 
 
@@ -27,9 +32,10 @@ source("../R/functions_final.R")
 #Sample code for function, univar_plot
 univar_plot(peak_trough = "Cmax", dep_var = "ELU")
 ```
-  When interpreting the output from the preliminary data, there appears to be stronger linear relationships with certain variables, including `Caseum_binding`, `ICS` and `RIM`, compared to others. Some relationships are positively correlated, such as `QD` and `huPPB`, whereas others are negatively correlated, such as `Caseum_binding` and `ICS`. It appears that the relationship between independent and dependent variables are dependent on dose for variables such as `cLogP`, `huPPB`, `PLA`, and `SLE`. The others are not dependent on dose in this preliminar dataset. Therefore, dose may be an important factor to consider when evaluating the relationships between independent and dependent variable. 
+  
+  When interpreting the output from the preliminary data, there appears to be stronger linear relationships with certain variables, including `Caseum_binding`, `ICS` and `RIM`, compared to others. Some relationships are positively correlated, such as `QD` and `huPPB`, whereas others are negatively correlated, such as `Caseum_binding` and `ICS`. It appears that the relationship between independent and dependent variables are dependent on dose for variables such as `cLogP`, `huPPB`, `PLA`, and `SLE`. The others are not dependent on dose in this preliminary dataset. Therefore, dose may be an important factor to consider when evaluating the relationships between independent and dependent variable. 
 
-# Function 2: Fit a linear model for each dependent variable regressed on independent variables
+## Fit a linear model for each dependent variable regressed on independent variables
   The goal of this function is to fit a linear regression model of dependent regressed on independent variables to assess the associations between them. Assumptions of this model are the observations are idependently and identically distributed, the error has a normal distribution, and there is a linear relationship between independent and dependent variables The function name is `linear_model`. The default input dataframe for this function is the `efficacy_summary` dataframe. Required user inputs to this function include `peak_trough` (options are Cmax or Trough), or the `dep_var` (options are ELU (lung efficacy) or ESP(spleen efficacy)). The output from this function provides a plot of the normalized model coefficients by each independent variable. The units of scale for each independent variable were normalized so that we could compare across coeficients. The model uncertainty (which is related to the sample size), is reflected by the size of the points, with smaller points having more uncertainty then larger points. 
   This function utilizes the package, `dplr`, to filter the level specified in peak_trough to either `Cmax` or `trough`, then gathers and selects based on independent variable names and measurements, as described for the above function. A function within this function defines the `lm` function, which uses `scale` scales the independent variable columns of the matrix, then regresses the dependent variable (ELU or ESP) on the independent measure. Using `dplr` package `group_by` and `nest` functions to create one row per group, and the individual observations are stored in a column that is a list of data frames. This is a useful structure when you have lists of other objects (like models) with one element per group, see [Hadley Wickam's post](https://blog.rstudio.com/2016/02/02/tidyr-0-4-0/) about this. We then use the `purrr` package to map the model function previously defined to the listed data, and then the `broom` package to create a tidy output of model coefficients. 
   We then unnest the dataframes and create a plot of the model estimates. In the plot, we utilize the package `forcats` to order the independent variable coeficients from low to high, and color by dose interval. the size of the points are plotted as the inverse of the standard error.
@@ -42,7 +48,7 @@ linear_model(peak_trough = "Cmax", dep_var = "ESP")
 ```
   The coefficient plot generated by this function shows each independent variable on the y axis and the respective model coefficient on the x axis, for either ELU or ESP. If the coefficient is negative, for example, as it is with MacUptake in the ELU model linear regression model, an interpretation would be for every unit of change in the MacUptake, the ELU will decrease by 0.5 Units. Therefore, MacUptake has a negative relationship with ELU, decreasing the ELU. The diameter of the point represents the level of certainty of the coeficient in this model. This may change as more data is collected for each drug. Variables that had a strong positive association with ELU were huPPB (BID only), cLogP (BID only), and muPPB (BID only), and variables with a strong negative association with ELU were MacUptake(QD only), MIC_Rv (BID only), Caseum_binding (BID only), and MIC ERdman (both doseages.  The variables that had a strong positive association with ESP were BID dose for RIM, SLE, ICS, OCS, PLAand ULU, but with low model certainty. The variables that had a strong negative association with ESP were MacUptake (QD) and huPPB (BID). 
   
-# Function 3: Visualizing individual drug efficacy by mouse
+## Visualizing individual drug efficacy by mouse
   The goal of this function, which now is using individual drug data, is to visualize efficacy in the lung or spleen and detect mouse data outliers in the dataset. The function name is `drug_mouse`, and the default input dataframe is `cleaned_2_combined`. Required user inputs to this function are the `dep_var`, so lung_efficacy or spleen_efficacy. Output from this function provides a plot of the efficacy by individual mouse. If there are individual outliers (calculated using 1.5xIQR rule), it will be labelled with mouse ID.
 
 ```{r, echo=TRUE, fig.width = 5, fig.height=3, fig.align='center'}
@@ -55,7 +61,54 @@ drug_mouse(dep_var = "spleen_efficacy")
   
   From this plot, it is clear that there is variation in the efficacy of each drug on lung efficacy or spleen efficacy using  the mouse model. This plot shows the individual mouse variation in efficacy for each drug. Outliers (calculated using the 1.5 X IQR rule), are automatically labelled with the mouse ID. In this dataset for `lung_efficacy`, mouse C for drug 4 was an outlier. There were no outliers present in the `spleen_efficacy` dataset. You can see that untreated mice were had the least efficacy to decrease bacteria in the lung or spleen, respectively.
 
-# Regression Tree Function:
+## LASSO:
+  The *Least Absolute Shrinkage Selector Operator* or LASSO function is a penalized maximum likelihood model. While in past model selection was traditionally performed with step-wise, forward, or backward selection; penalized maximum likelihood models are the next step forward. This group of models uses a restricted fir that shrinks the parameters (either to smaller numbers or to zero depending on the method used). The three models commonly used are ridge, LASSO, and elastic net. Ridge regression shrinks coefficients that are not meaningful in the prediction but it leave these small number in a model. The issue with this is that you still are using the same number of predictors and not simplifying a complex model. As a result, even though  coefficients are smaller; the model is still very close to saturated.
+	This is where LASSO comes in. LASSO shrinks estimates down to absolute zero and eliminates them from the model, making much simpler models. The advance of this is that you simplify your model. However, there are disadvantages as well. While LASSO is ideal for preventing multicollinearity (when one predictor can be predicted from another predictor in the model); this does mean that if two predictors are similar LASSO will drop of the predictors. This can be a concern when these predators are grouped and add information to the model that is valuable. Elastic net is a hybrid combination of these two models. 
+  For this model set, LASSO was chosen to simplify the model and there were not major concerns for predictors that needed to stay in the model that may have been dropped as a result of multicollinearity. The package we used for LASSO regression was `glmnet`. To prepare this data for input into the function; a few steps had to be taken. First, all missing data was removed via the ` na.omit` call. From there, all predictors that were not numeric were removed via ` select_if(is.numeric)`. From there, the original data had to be reformatted into a numeric list and a vector for the correct formatting of the function. Once the data was correctly formatted, the LASSO model was very straight forward to fit, ` fit = glmnet(x, y)`. While there was an option to visualize the coefficients, the final function only outputs the point estimates. One parameter I had to set in the function was the `s` value in the `coef` call. The `s` value is the lambda parameter, which is pulled from the minimum lambda I observed while building the model. The Gaussian linear model was the default fit for this package; which was appropriate for these data.  
+  
+####  LASSO code :
+```{r echo=TRUE, eval=FALSE}
+LASSO_model <- function(dep_var, dose, df = efficacy_summary) {
+  if(dep_var != c("ELU", "ESP")) stop('Hey! You can only use ELU or ESP for dep_var!') 
+  dataz <- na.omit(df) %>% 
+  select_if(is.numeric) %>%
+  filter(dosage == dose)
+
+response <- dataz %>% 
+  select(dep_var)
+
+predictors <- dataz %>%
+  select(c("PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", 
+           "cLogP", "huPPB", "muPPB", "MIC_Erdman", 
+           'MICserumErd', "MIC_Rv", "Caseum_binding", "MacUptake"))
+
+y <- as.numeric(unlist(response))
+x <- as.matrix(predictors)
+
+fit = glmnet(x, y)
+
+coeff <- coef(fit,s=0.1)
+coeff <- as.data.frame(as.matrix(coeff)) %>% 
+rownames_to_column() 
+colnames(coeff) <- c("predictor", "coeff")
+
+coeff <- coeff %>% 
+  filter(coeff > 0) 
+coeff %>% 
+  kable()
+}
+```
+ 
+#### LASSO Example:
+```{r, echo=TRUE, eval=FALSE}
+LASSO_model("ELU", 50)
+```
+
+```{r echo=FALSE}
+LASSO_model("ELU", 50)
+```
+
+## Regression Tree Function:
 
 The regression tree function is used as a way to helps us determine which independent variables have the largest influence on our outcomes of lung efficacy (ELU) or spleen efficacy (ESP). We begin with a tidy dataset of all observations (in this case, 20) called `efficacy_summary`. We then choose an independent variable of interest; here we have chosen ELU. To run the function, we input ELU along with all of the independent variables from the dataset into the `rpart()` function, as seen in the code below. In the function, we also specify the dataset from which to pull the variables, as well as control parameters that determine how the function runs. 
 
@@ -103,6 +156,45 @@ Starting from node one, the first split is made so that it leads to the greatest
 regression_tree(dep_var = "ESP", min_split = 8, min_bucket = 4)
 ```
 
+## Random Forest  
+
+The function `best_variables` generates an interactive graph displaying which independent variables are the best predictors for lung efficacy (`ELU`) or spleen efficacy (`ESP`). When a point on the graph is selected a window appears showing the variable’s name, the mean standard error, and a definition of the variable. The function utilizes the ensemble learning method Random Forest, so the higher the mean standard error the more important the variable. The function takes the following input parameters and outputs a plotly graph.     
+  -  `dep_var`. The user must specify the dependent variable of interest which can either be “`ELU`” or “`ESP`”. If the user does not choose a dependent variable the function automatically utilizes “`ELU`”. 
+
+  - `drug`. This call line allows the user to either include or exclude the variable `drug` which corresponds to the drug being tested. The user can either specify TRUE or FALSE. The function defaults to FALSE where the variable `drug` is excluded. 
+  
+  -  `df`. This call specifies which data frame to use for the function. The default data frame is efficacy summary; however, the user can specify another data frame if they choose. If the user chooses another data frame they need to  ensure  the data frame is compatible with the function. In order to be compatible the function must have a variable titles as either ESP or ELU. The function only works for variables that are either factor or numeric. The function automatically converts `drug`, `level`, `dose_int`, and `dosage` to factor variables. It also converts `muPPB` and `huPPB` to numeric variables. 
+  
+#### Example Showing function calls. 
+```{r, echo = TRUE , eval = FALSE}
+best_variables(dep_var = "ELU", drug = FALSE, df = efficacy_summary)
+```
+
+#### Graph output
+```{r, echo = FALSE , eval = TRUE, include = TRUE, fig.height = 3}
+graph <- best_variables(dep_var = "ELU", drug = FALSE, df = efficacy_summary)
+export(p = graph, file = "graph.png")
+
+```
+  
+  The graph displayed above shows variable importance using `ELU` as a predictor. The data points are color codded based on the variables classification as either in vitro, in vivo, or drug. As you can see in the graph, the three most important variables are `MIC Rv Strain`, `Caseum Binding`, and `Mouse Plasma Binding`. 
+  
+  
+  The code segment below shows the call for the Random Forest algorithm used to determine which variables are the best important. 
+
+```{r, eval = FALSE, echo = TRUE}
+efficacy.rf <- randomForest( ESP ~ ., data =dataset,
+              na.action = na.roughfix,
+                        ntree= 500, 
+                        importance = TRUE)
+
+```
+
+The function utilizes the package `randomForest`. Random Forest is a machine learning algorithm that generates individual trees by bootstrapping the data. At each tree, a small number of variables are  randomly selected from all the variables in the data frame. This node is then split by selecting the best predictor variable from the random subset of variables. In order to determine the most important variables, Random Forest permutates one variable at a time and looks at the corresponding change in the model's mean standard error. If the mean standard error increases when the variable is removed then that variable will have a cooresponding high mean standard error. This indiciates that the variable is important to the model and is a good predictor. For example if the variable `MIC Rv Strain` is removed then the mean standard error of the entire model increases by 14.5%. 
+  
+  The function randomForest does not work if there are any missing variables in the data set. As a result, missing variables are replaced using a columns mean/mode. This feature is illustrated in the call `na.action = na.roughfix`. The function `best_variable` has Random Forest create 500 unique trees and utilize 6 randomly selected variables at each tree. 500 was chosen because it produces a reliable model while also reducing computational power. 6 variables were chosen at each node because the default method is: total number of variables / 3, which equates to 6. Other number of variable selection (such as 3 and 12) were each tried; however, there was no noticeable in either model compared to the default.   
+  
+  
 # Room for errors 
   These functions may be prone to several errors as new data is used as inputs. This includes possible errors if input datasets have low or high number of observations. In addition, errors could occur if missing data are recorded differently. We noticed in the individual drug data, the "NA", or missing data for spleen_efficacy had a space before the NA. This type of variation in how missing data is recorded could cause problems for the functions, although we tried to make them robust to these types of variations. Another potential problem could arise if drug names or independent variable column names change, as the functions are designed to handle the specified default dataframes. Most of the current functions in this project intake a "tidy" form of the dataframe, `efficacy summary`, with column names including: "drug", "dosage", "dose_int", "level", "PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "ELU", "ESP", "cLogP", "huPPB", "muPPB", "MIC_Erdman", "MICserumErd", "MIC_Rv", "Caseum_binding", and "MacUptake". Also, new independent variables or measurements are added to the dataframe could change the intput or output of the plot or model functions. Lastly, the dataset provided included two dose frequency combinations, 50 BID and 100 QD. If these dose and frequency combinations change, it could cause problems with some of the functions as they specifically look at those two dose-frequency combinations in the outputs. 
 
