@@ -293,6 +293,14 @@ best_variables("ELU", drug = FALSE)
 
 ```
 
+## Interpretation
+
+- The larger the mean squared error the more important the variable. 
+
+- `MIC Rv Strain`, `Mouse Plasma Binding`, and `Caseum Binding` are the most important
+
+- In vitro variables seem to be better predictors than in vivo variables
+
 ## Random Forest example with `ESP`
 
 ```{r testing function 2, echo = TRUE}
@@ -300,13 +308,7 @@ best_variables("ESP", drug = TRUE)
 
 ```
 
-## Interpretation
-
-- The larger the mean squared error the more important the variable. 
-
-- `MIC Rv Strain`, `Mouse Plasma Binding`, and `Caseum Binding` are the most important
-
-- In vitro variables seem to be better predictors than in vivo variables 
+ 
 
 
 
