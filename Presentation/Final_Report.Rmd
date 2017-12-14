@@ -155,6 +155,40 @@ Starting from node one, the first split is made so that it leads to the greatest
 regression_tree(dep_var = "ESP", min_split = 8, min_bucket = 4)
 ```
 
+## Random Forest  
+
+The function `best_variables` generates an interactive graph displaying which independent variables are the best predictors for lung efficacy (`ELU`) or spleen efficacy (`ESP`). When a point on the graph is selected a window appears showing the variable’s name, the mean standard error, and a definition of the variable. The function utilizes the ensemble learning method Random Forest, so the higher the mean standard error the more important the variable. The function takes the following input parameters and outputs a plotly graph.     
+  -  `dep_var`. The user must specify the dependent variable of interest which can either be “`ELU`” or “`ESP`”. If the user does not choose a dependent variable the function automatically utilizes “`ELU`”. 
+
+  - `drug`. This call line allows the user to either include or exclude the variable `drug` which corresponds to the drug being tested. The user can either specify TRUE or FALSE. The function defaults to FALSE where the variable `drug` is excluded. 
+  
+  -  `df`. This call specifies which data frame to use for the function. The default data frame is efficacy summary; however, the user can specify another data frame if they choose. If the user, chooses another data frame they need to be insure that the data frame is compatible with the function. In order to be compatible the function must have a variable titles as either ESP or ELU. The function only works for variables that are either factor or numeric. The function automatically converts `drug`, `level`, `dose_int`, and `dosage` to factor variables. It also converts `muPPB` and `huPPB` to numeric variables. 
+  
+#### Example Showing function calls. 
+```{r, echo = true, eval = false}
+
+best_variables()
+```
+
+#### Graph output
+```{r, echo = false, eval = true}
+
+best_variables()
+```
+
+  
+  The graph displayed above shows variable importance using `ELU` as a predictor. The data points are color codded based on the variables classification as either in vitro, in vivo, or drug. As you can see in the graph, the three most important variables are `MIC Rv Strain`, `Caseum Binding`, and `Mouse Plasma Binding`. 
+  
+  
+  The code segment below shows the call for the Random Forest algorithm used to determine which variables are the best important. 
+  
+  
+  The function utilizes the package `randomForest`. Random Forest algorithms work by generating individual trees by bootstrapping the data. At each tree a small number of variables are then randomly selected from all the variables in the data frame. This node is then split by selecting the best predictor variable from the random subset of variables. In order to determine which variables are the most important, Random Forest permutates one variable at a time and looks at the corresponding change in the model's mean standard error. For example if the variable `MIC Rv Strain` is removed then the mean standard error of the entire model increases by 14.5%. 
+  
+  The function randomForest does not work if there are any missing variables in the data set. As a result, missing variables are replaced using a columns mean/mode. This feature is illustrated in the call na.action = na.roughfix. The function `best_variable` has Random Forest create 500 unique trees and utilize 6 randomly selected variables at each tree. 500 was chosen because it produces a reliable model while also reducing computational power. 6 variables were chosen at each because the default method is: total number of variables / 3, which equates to 6. Other number of variable selection (such as 3 and 12) were each tried; however, there was no noticeable in either model compared to the default. 
+
+
+
 # Room for errors 
   These functions may be prone to several errors as new data is used as inputs. This includes possible errors if input datasets have low or high number of observations. In addition, errors could occur if missing data are recorded differently. We noticed in the individual drug data, the "NA", or missing data for spleen_efficacy had a space before the NA. This type of variation in how missing data is recorded could cause problems for the functions, although we tried to make them robust to these types of variations. Another potential problem could arise if drug names or independent variable column names change, as the functions are designed to handle the specified default dataframes. Most of the current functions in this project intake a "tidy" form of the dataframe, `efficacy summary`, with column names including: "drug", "dosage", "dose_int", "level", "PLA", "ULU", "RIM", "OCS", "ICS", "SLU", "SLE", "ELU", "ESP", "cLogP", "huPPB", "muPPB", "MIC_Erdman", "MICserumErd", "MIC_Rv", "Caseum_binding", and "MacUptake". Also, new independent variables or measurements are added to the dataframe could change the intput or output of the plot or model functions. Lastly, the dataset provided included two dose frequency combinations, 50 BID and 100 QD. If these dose and frequency combinations change, it could cause problems with some of the functions as they specifically look at those two dose-frequency combinations in the outputs. 
 

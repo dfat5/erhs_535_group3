@@ -19,128 +19,35 @@ source("practice_data.R")
  playing with randomForest package 
  
 
+The function 'best_variables' utilizes Random Forest algorethims to 
+
 Using RandomForest package want to determine which variables are the most important and make plot dislaying which variabels are good predictors of ELU, so need to select good predictor variables. 
 After converting all varaibles to either factor or numeric, 
 
-```{r using random forest for our anaylsis }
-
-efficacy_sumrf <- efficacy_summary %>% 
-  select(-ESP) %>% 
-  mutate(huPPB = as.numeric(huPPB), 
-         muPPB = as.numeric(muPPB), 
-         dosage = as.factor(dosage), 
-         dose_int = as.factor(dose_int), 
-         level = as.factor(level), 
-         drug = as.factor(drug))
-
-  #rename("Caseum Binding" = Caseum_binding)
-
-str(efficacy_sumrf)
-
-efficacy.rf <- randomForest( ELU~ ., data = efficacy_sumrf,
-              na.action = na.roughfix,
-                        ntree= 5000, 
-                        importance = TRUE)
 
 
+The function `best_variables` generates an interactive graph displaying which independent variables are the best predictors for lung efficacy (`ELU`) or spleen efficacy (`ESP`). When a point on the graph is selected a window appears showing the variable’s name, the mean standard error, and a definition of the variable. The function utilizes the enselble learning method Random Forest, so the higher the mean standard error the more important the variable. The function takes the following input parameters and outputs a plotly graph.   
+	
+  - `dep_var`. The user must specify the dependent variable of interest which can either be “`ELU`” or “`ESP`”. If the user does not choose a dependent variable the function automatically utilizes “`ELU`”. 
 
-```
- notes: use %incMSE and export to ggplot to make a prettier graph! also in your report specify what is being specified and what is not being speciefied ie mtry etc. 
- MSE is mean decrease in accuracy 
- 
-also maybe do doseage so you can check dosage 
- 
- 
- 
- 
-```{r playing with Random forest graph}
-print(efficacy.rf)
-
-head(variable_definitions)
-
-trash <- 
-
-variable_definitions$Name <- str_replace(variable_definitions$Name, " ", "_" )
-
-efficacy_sumrf <- efficacy_summary %>% 
-  select(-ESP) %>% 
-  mutate(huPPB = as.numeric(huPPB), 
-         muPPB = as.numeric(muPPB), 
-         dosage = as.factor(dosage), 
-         dose_int = as.factor(dose_int), 
-         level = as.factor(level), 
-         drug = as.factor(drug)) 
-
-
-?left_join
-?str_replace
-variable
-
-importance(efficacy.rf, type = 1)
-
-
-
-graph <-importance(efficacy.rf, type = 1) %>% 
-  as.data.frame() %>% 
-  rownames_to_column() %>% 
-  rename(variable = rowname, 
-         mse = `%IncMSE`) %>%  
-  left_join(variable_definitions, 
-            by = c("variable" = "Name"))
-
-str(graph)
-trash <- graph %>% 
-  strwrap(Definition, width = 20)
-
-variable_definitions$Definition <- str_wrap(variable_definitions$Definition, 
-                                            width = 20,) 
-
-
-?left_join
-
-title <- paste0 (c("Predicing Variable Importance Using"))
-
-
-test <- graph %>% 
-  filter(mse > 0) %>% 
-  ggplot()+
-  geom_point(aes(x = mse, 
-                 y = reorder(Label, mse), 
-                 color = Vitro_or_Vivo, 
-                 text = paste('Mean Standard Error: ', round(mse, digits = 2), '\n',
-                              'Variable: ', Label, '\n',
-                              'Definition: ', str_wrap(Definition, width = 40)
-                              )))+
-  theme_minimal()+
-  #ggtitle(title)+
-  labs(y = "Variable", 
-       x = "Importance", 
-       color = "In Vivo, In Vitro, or Drug" )
-
-?round
-
-ggplotly(test, tooltip = c("text"))
-
-
-  theme(legend.title = element_text( title = "In Vivo, In Vitro, or Drug" ))
- 
-?plotly
-?theme
+  -`drug`. This call line allows the user to either include or exclude the variable `drug` which corresponds to the drug being tested. The user can either specificy TRUE or FALSE. The function defaults to FALSE where the variable `drug` is excluded. 
   
-  ?labs
+  - `df`. This call specifies which data frame to use for the function. The default data frame is efficacy summary; however, the user can specificy another data frame if they choose. If the user, chooses another data frame they need to be insure that the data frame is compatabile with the function. In order to be comptabile the function must have a variable titles as either ESP or ELU. The function only works for variables that are either factor or numeric. The function automatically converts `drug`, `level`, `dose_int`, and `dosage` to factor variables. It also converts `muPPB` and `huPPB` to numeric variables. 
+  
+  Example Showing function calls. 
+  
+  The graph displayed above shows  variable importance using `ELU` as a predictor. The data points are color codded based on the variables classification as either in vitro, in vivo, or drug. As you can see in the graph, the three most important variables are `MIC Rv Strain`, `Caseum Binding`, and `Mouse Plasma Binding`. 
+  
+  
+  The code segement below shows the call for the Random Forest algorethim used to determine which variables are the best important. 
+  
+  
+  The function utilizes the package `randomForest`. Random Forest algorethims work by generating individual trees by bootstrapping the data. At each tree a small number of varibles are then randomly selected from all the varaibles in the data frame. This node is then split by selecting the best predictor variable from the random subset of varaibles. In order to determine which variables are the most important, Random Forest permutates one variable at a time and looks at the cooresponding change in the model's mean standard error. For example if the variable `MIC Rv Strain` is removed then the mean standard error of the entire model increases by 14.5%. 
+  
+  The function randomForest does not work if there are any missing variables in the data set. As a result, missing variables are replaced using a columns mean/mode. This feature is illustrated in the call na.action = na.roughfix. The function `best_variable` has Random Forest create 500 unique trees and utilize 6 randomly selected variables at each tree. 500 was choosen because it produces a reliable model while also reducing computational power. 6 variables were choosen at each because the default method is: total number of variables / 3, which equates to 6. Other number of variable selection (such as 3 and 12) were each tried; however, there was no noticiable in either model compared to the default. 
 
-?str_wrap
 
-?as.data.frame()
-
-```
-
-
-
-vignette("randomForest")
-
-
-```{r writting function}
+```{r writting function, echo = true }
 best_variables <- function(dep_var = "ELU", drug = FALSE, df = efficacy_summary){
   
   
@@ -221,11 +128,105 @@ add drug exlude if include drug is false select it out
 
 ```{r testing function}
 
+best_variables("ELU", TRUE)
+#best_variables("ESP")
+export(best_variables())
 
-best_variables("ELU", drug = TRUE)
-best_variables("ESP")
+?plotly_IMAGE
 
 ```
+
+```{r playing with different randomForest ideas }
+
+efficacy_sumrf <- efficacy_summary %>% 
+  select(-ESP) %>% 
+  mutate(huPPB = as.numeric(huPPB), 
+         muPPB = as.numeric(muPPB), 
+         dosage = as.factor(dosage), 
+         dose_int = as.factor(dose_int), 
+         level = as.factor(level), 
+         drug = as.factor(drug))
+
+  #rename("Caseum Binding" = Caseum_binding)
+
+str(efficacy_sumrf)
+
+efficacy.rf <- randomForest( ELU~ ., data = efficacy_sumrf,
+              na.action = na.roughfix,
+                        ntree= 5000, 
+                        importance = TRUE)
+
+
+
+```
+ notes: use %incMSE and export to ggplot to make a prettier graph! also in your report specify what is being specified and what is not being speciefied ie mtry etc. 
+ MSE is mean decrease in accuracy 
+ 
+also maybe do doseage so you can check dosage 
+ 
+ 
+ 
+ 
+```{r playing with Random forest graph}
+
+efficacy_sumrf <- efficacy_summary %>% 
+  select(-ESP) %>% 
+  mutate(huPPB = as.numeric(huPPB), 
+         muPPB = as.numeric(muPPB), 
+         dosage = as.factor(dosage), 
+         dose_int = as.factor(dose_int), 
+         level = as.factor(level), 
+         drug = as.factor(drug)) 
+
+
+importance(efficacy_sumrf, type = 1)
+
+
+
+graph <-importance(efficacy.rf, type = 1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  rename(variable = rowname, 
+         mse = `%IncMSE`) %>%  
+  left_join(variable_definitions, 
+            by = c("variable" = "Name"))
+
+
+title <- paste0 (c("Predicing Variable Importance Using"))
+
+
+test <- graph %>% 
+  filter(mse > 0) %>% 
+  ggplot()+
+  geom_point(aes(x = mse, 
+                 y = reorder(Label, mse), 
+                 color = Vitro_or_Vivo, 
+                 text = paste('Mean Standard Error: ', round(mse, digits = 2), '\n',
+                              'Variable: ', Label, '\n',
+                              'Definition: ', str_wrap(Definition, width = 40)
+                              )))+
+  theme_minimal()+
+  #ggtitle(title)+
+  labs(y = "Variable", 
+       x = "Importance", 
+       color = "In Vivo, In Vitro, or Drug" )
+
+
+
+ggplotly(test, tooltip = c("text"))
+
+
+  theme(legend.title = element_text( title = "In Vivo, In Vitro, or Drug" ))
+ 
+
+```
+
+
+
+vignette("randomForest")
+
+
+
 
 
 ```{r trying out mtry}
