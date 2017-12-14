@@ -174,7 +174,7 @@ rpart(ELU ~  drug + dosage + level +
 
 ```{r, echo=TRUE, eval=FALSE}
 regression_tree(dep_var = "ELU", min_split = 8, 
-                min_bucket = 6)
+                min_bucket = 4)
 ```
 
 ## Regression Tree Function example (ELU)
